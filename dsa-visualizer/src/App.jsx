@@ -2,6 +2,7 @@ import { useState } from "react";
 import Navbar from "./components/Navbar";
 import Controls from "./components/Controls";
 import SortingVisualizer from "./components/SortingVisualizer";
+import { bubbleSort } from "./algorithms/bubbleSort";
 
 function App() {
   const [array, setArray] = useState([]);
@@ -21,7 +22,10 @@ function App() {
       <Navbar />
 
       <div className="px-6">
-        <Controls generateArray={generateArray} />
+        <Controls
+  generateArray={generateArray}
+  bubbleSort={() => bubbleSort(array, setArray)}
+/>
         <SortingVisualizer
           array={array}
           generateArray={generateArray}

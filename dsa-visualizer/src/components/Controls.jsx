@@ -1,4 +1,4 @@
-function Controls({ generateArray }) {
+function Controls({ generateArray,bubbleSort }) {
   return (
     <div className="bg-slate-800 rounded-xl shadow-lg p-6 mt-8 mx-auto max-w-6xl">
       <div className="flex flex-wrap justify-center gap-4">
@@ -10,7 +10,9 @@ function Controls({ generateArray }) {
           Generate Array
         </button>
 
-        <button className="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2 rounded-lg font-semibold transition">
+        <button 
+        onClick={bubbleSort}
+         className="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2 rounded-lg font-semibold transition">
           Bubble Sort
         </button>
 
