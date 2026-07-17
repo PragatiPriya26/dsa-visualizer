@@ -1,14 +1,17 @@
-import { useEffect } from "react";
 import ArrayBars from "./ArrayBars";
 
-function SortingVisualizer({ array, generateArray }) {
-  useEffect(() => {
-    generateArray();
-  }, []);
-
+function SortingVisualizer({
+  array,
+  activeBars,
+  sortedBars,
+})  {
   return (
     <div className="mt-10">
-      <ArrayBars array={array} />
+      <ArrayBars
+  array={array}
+  activeBars={activeBars}
+  sortedBars={sortedBars}
+/>
     </div>
   );
 }
