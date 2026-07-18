@@ -5,8 +5,19 @@ export async function bubbleSort(
   setActiveBars,
   setSwappingBars,
   setSortedBars,
-  setIsSorting
+  setIsSorting,
+  setComparisons,
+  setSwaps,
+  setElapsedTime
 ) {
+  const start = performance.now();
+
+let comparisons = 0;
+let swaps = 0;
+
+setComparisons(0);
+setSwaps(0);
+setElapsedTime(0);
   const arr = [...array];
 
   setIsSorting(true);
@@ -25,7 +36,8 @@ export async function bubbleSort(
       await new Promise(resolve =>
         setTimeout(resolve, speed)
       );
-
+comparisons++;
+setComparisons(comparisons);
       // Compare values
       if (arr[j].value > arr[j + 1].value) {
 
@@ -40,6 +52,8 @@ export async function bubbleSort(
         [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
 
         setArray([...arr]);
+        swaps++;
+setSwaps(swaps);
 
         // Keep orange visible
         await new Promise(resolve =>
@@ -53,6 +67,9 @@ export async function bubbleSort(
     }
 
     setSortedBars(prev => [...prev, arr.length - i - 1]);
+    const end = performance.now();
+
+setElapsedTime(Math.round(end - start));
   }
 
   setActiveBars([]);

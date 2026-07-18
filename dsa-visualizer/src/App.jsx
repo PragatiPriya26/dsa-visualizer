@@ -19,6 +19,9 @@ function App() {
 
   const [selectedAlgorithm, setSelectedAlgorithm] = useState("bubble");
   const [swappingBars, setSwappingBars] = useState([]);
+  const [comparisons, setComparisons] = useState(0);
+const [swaps, setSwaps] = useState(0);
+const [elapsedTime, setElapsedTime] = useState(0);
   
 
  function generateArray() {
@@ -67,7 +70,10 @@ function App() {
   setActiveBars,
   setSwappingBars,
   setSortedBars,
-  setIsSorting
+  setIsSorting,
+  setComparisons,
+  setSwaps,
+  setElapsedTime
 );
             }}
             selectionSort={() => {
@@ -104,7 +110,12 @@ function App() {
           </div>
 
           {/* Right Sidebar */}
-          <Sidebar selectedAlgorithm={selectedAlgorithm} />
+          <Sidebar
+  selectedAlgorithm={selectedAlgorithm}
+  comparisons={comparisons}
+  swaps={swaps}
+  elapsedTime={elapsedTime}
+/>
 
         </div>
 

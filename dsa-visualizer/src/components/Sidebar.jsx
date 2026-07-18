@@ -1,6 +1,11 @@
 import ComplexityCard from "./ComplexityCard";
 
-function Sidebar({ selectedAlgorithm }) {
+function Sidebar({
+  selectedAlgorithm,
+  comparisons,
+  swaps,
+  elapsedTime,
+})  {
   return (
     <div className="space-y-6">
 
@@ -15,17 +20,17 @@ function Sidebar({ selectedAlgorithm }) {
         <div className="space-y-3">
           <div className="flex justify-between">
             <span>Comparisons</span>
-            <span>0</span>
+            <span>{comparisons}</span>
           </div>
 
           <div className="flex justify-between">
             <span>Swaps</span>
-            <span>0</span>
+            <span>{swaps}</span>
           </div>
 
           <div className="flex justify-between">
             <span>Elapsed Time</span>
-            <span>0 ms</span>
+            <span>{elapsedTime} ms</span>
           </div>
         </div>
       </div>
