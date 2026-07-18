@@ -3,35 +3,59 @@ export async function bubbleSort(
   setArray,
   speed,
   setActiveBars,
-  setSortedBars
+  setSwappingBars,
+  setSortedBars,
+  setIsSorting
 ) {
   const arr = [...array];
+
+  setIsSorting(true);
   setSortedBars([]);
+  setActiveBars([]);
+  setSwappingBars([]);
 
   for (let i = 0; i < arr.length; i++) {
-    for (let j = 0; j < arr.length - i - 1; j++) {
-      setActiveBars([j, j + 1]);
 
-await new Promise((resolve) =>
-  setTimeout(resolve, speed)
-);
-      if (arr[j] > arr[j + 1]) {
-        // Swap
+    for (let j = 0; j < arr.length - i - 1; j++) {
+
+      // Highlight compared bars
+      setActiveBars([j, j + 1]);
+      setSwappingBars([]);
+
+      await new Promise(resolve =>
+        setTimeout(resolve, speed)
+      );
+
+      // Compare values
+      if (arr[j].value > arr[j + 1].value) {
+
+        // Highlight swapping bars
+        setSwappingBars([j, j + 1]);
+
+        await new Promise(resolve =>
+          setTimeout(resolve, speed)
+        );
+
+        // Swap objects
         [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
 
-        // Update UI
         setArray([...arr]);
 
-        // Wait according to slider value
-        await new Promise((resolve) => setTimeout(resolve, speed));
+        // Keep orange visible
+        await new Promise(resolve =>
+          setTimeout(resolve, speed)
+        );
+
+        setSwappingBars([]);
       }
+
+      setActiveBars([]);
     }
-    setSortedBars((prev) => [
-      ...prev,
-      arr.length - i - 1,
-    ]);
-  
+
+    setSortedBars(prev => [...prev, arr.length - i - 1]);
   }
-  
+
   setActiveBars([]);
+  setSwappingBars([]);
+  setIsSorting(false);
 }
