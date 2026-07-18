@@ -7,6 +7,8 @@ function Controls({
   speed,
   setSpeed,
   isSorting,
+  isPaused,
+  setIsPaused,
 }) {
   return (
     <div className="bg-slate-800 rounded-xl shadow-lg p-6 mt-8 mx-auto max-w-6xl">
@@ -39,7 +41,17 @@ function Controls({
         >
           Bubble Sort
         </button>
-
+<button
+  onClick={() => setIsPaused(!isPaused)}
+  disabled={!isSorting}
+  className={`px-5 py-2 rounded-lg font-semibold transition ${
+    !isSorting
+      ? "bg-gray-500 text-gray-300 cursor-not-allowed opacity-60"
+      : "bg-yellow-500 hover:bg-yellow-600 text-white"
+  }`}
+>
+  {isPaused ? "Resume" : "Pause"}
+</button>
         {/* Selection Sort */}
         <button
           onClick={selectionSort}

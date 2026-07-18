@@ -6,6 +6,7 @@ import SortingVisualizer from "./components/SortingVisualizer";
 import Sidebar from "./components/Sidebar";
 import { bubbleSort } from "./algorithms/bubbleSort";
 import { selectionSort } from "./algorithms/selectionSort";
+import TracePanel from "./components/TracePanel";
 
 
 function App() {
@@ -22,6 +23,8 @@ function App() {
   const [comparisons, setComparisons] = useState(0);
 const [swaps, setSwaps] = useState(0);
 const [elapsedTime, setElapsedTime] = useState(0);
+const [currentLine, setCurrentLine] = useState(0);
+const [isPaused, setIsPaused] = useState(false);
   
 
  function generateArray() {
@@ -57,44 +60,53 @@ const [elapsedTime, setElapsedTime] = useState(0);
         />
 
         {/* Controls */}
-        <div className="mt-6">
-          <Controls
-            generateArray={generateArray}
-            bubbleSort={() => {
-              setSelectedAlgorithm("bubble");
+<div className="mt-6">
+  <Controls
+    generateArray={generateArray}
 
-              bubbleSort(
-  array,
-  setArray,
-  speed,
-  setActiveBars,
-  setSwappingBars,
-  setSortedBars,
-  setIsSorting,
-  setComparisons,
-  setSwaps,
-  setElapsedTime
-);
-            }}
-            selectionSort={() => {
-              setSelectedAlgorithm("selection");
+    bubbleSort={() => {
+      setSelectedAlgorithm("bubble");
 
-              selectionSort(
-                array,
-                setArray,
-                speed,
-                setActiveBars,
-                setSortedBars,
-                setIsSorting
-              );
-            }}
-            arraySize={arraySize}
-            setArraySize={setArraySize}
-            speed={speed}
-            setSpeed={setSpeed}
-            isSorting={isSorting}
-          />
-        </div>
+      bubbleSort(
+        array,
+        setArray,
+        speed,
+        setActiveBars,
+        setSwappingBars,
+        setSortedBars,
+        setIsSorting,
+        setComparisons,
+        setSwaps,
+        setElapsedTime,
+        setCurrentLine
+      );
+    }}
+
+    selectionSort={() => {
+      setSelectedAlgorithm("selection");
+
+      selectionSort(
+        array,
+        setArray,
+        speed,
+        setActiveBars,
+        setSortedBars,
+        setIsSorting
+      );
+    }}
+
+    arraySize={arraySize}
+    setArraySize={setArraySize}
+    speed={speed}
+    setSpeed={setSpeed}
+    isSorting={isSorting}
+    isPaused={isPaused}
+    setIsPaused={setIsPaused}
+  />
+</div>
+              
+
+            
 
         {/* Dashboard */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
@@ -107,6 +119,12 @@ const [elapsedTime, setElapsedTime] = useState(0);
   swappingBars={swappingBars}
   sortedBars={sortedBars}
 />
+<div className="mt-6">
+  <TracePanel
+  algorithm={selectedAlgorithm}
+  currentLine={currentLine}
+/>
+</div>
           </div>
 
           {/* Right Sidebar */}

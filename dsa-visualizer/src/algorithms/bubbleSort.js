@@ -8,16 +8,18 @@ export async function bubbleSort(
   setIsSorting,
   setComparisons,
   setSwaps,
-  setElapsedTime
+  setElapsedTime,
+  setCurrentLine
 ) {
   const start = performance.now();
 
-let comparisons = 0;
-let swaps = 0;
+  let comparisons = 0;
+  let swaps = 0;
 
-setComparisons(0);
-setSwaps(0);
-setElapsedTime(0);
+  setComparisons(0);
+  setSwaps(0);
+  setElapsedTime(0);
+
   const arr = [...array];
 
   setIsSorting(true);
@@ -27,35 +29,41 @@ setElapsedTime(0);
 
   for (let i = 0; i < arr.length; i++) {
 
+    setCurrentLine(1);
+
     for (let j = 0; j < arr.length - i - 1; j++) {
 
-      // Highlight compared bars
+      setCurrentLine(2);
+
       setActiveBars([j, j + 1]);
       setSwappingBars([]);
 
       await new Promise(resolve =>
         setTimeout(resolve, speed)
       );
-comparisons++;
-setComparisons(comparisons);
-      // Compare values
+
+      comparisons++;
+      setComparisons(comparisons);
+
+      setCurrentLine(3);
+
       if (arr[j].value > arr[j + 1].value) {
 
-        // Highlight swapping bars
         setSwappingBars([j, j + 1]);
 
         await new Promise(resolve =>
           setTimeout(resolve, speed)
         );
 
-        // Swap objects
+        setCurrentLine(4);
+
         [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
 
-        setArray([...arr]);
         swaps++;
-setSwaps(swaps);
+        setSwaps(swaps);
 
-        // Keep orange visible
+        setArray([...arr]);
+
         await new Promise(resolve =>
           setTimeout(resolve, speed)
         );
@@ -67,11 +75,12 @@ setSwaps(swaps);
     }
 
     setSortedBars(prev => [...prev, arr.length - i - 1]);
-    const end = performance.now();
-
-setElapsedTime(Math.round(end - start));
   }
 
+  const end = performance.now();
+  setElapsedTime(Math.round(end - start));
+
+  setCurrentLine(0);
   setActiveBars([]);
   setSwappingBars([]);
   setIsSorting(false);
