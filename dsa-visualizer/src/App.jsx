@@ -4,135 +4,191 @@ import AlgorithmTabs from "./components/AlgorithmTabs";
 import Controls from "./components/Controls";
 import SortingVisualizer from "./components/SortingVisualizer";
 import Sidebar from "./components/Sidebar";
-import { bubbleSort } from "./algorithms/bubbleSort";
-import { selectionSort } from "./algorithms/selectionSort";
 import TracePanel from "./components/TracePanel";
 
+import { bubbleSort } from "./algorithms/bubbleSort";
+import { selectionSort } from "./algorithms/selectionSort";
 
 function App() {
   const [array, setArray] = useState([]);
   const [arraySize, setArraySize] = useState(30);
   const [speed, setSpeed] = useState(80);
+  const [arrayType, setArrayType] = useState("random");
 
   const [activeBars, setActiveBars] = useState([]);
+  const [swappingBars, setSwappingBars] = useState([]);
+  const [minBar, setMinBar] = useState(-1);
   const [sortedBars, setSortedBars] = useState([]);
+
   const [isSorting, setIsSorting] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
 
   const [selectedAlgorithm, setSelectedAlgorithm] = useState("bubble");
-  const [swappingBars, setSwappingBars] = useState([]);
+
   const [comparisons, setComparisons] = useState(0);
-const [swaps, setSwaps] = useState(0);
-const [elapsedTime, setElapsedTime] = useState(0);
-const [currentLine, setCurrentLine] = useState(0);
-const [isPaused, setIsPaused] = useState(false);
-  
+  const [swaps, setSwaps] = useState(0);
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const [currentLine, setCurrentLine] = useState(0);
+const [progress, setProgress] = useState(0);
 
- function generateArray() {
-  const newArray = [];
+  function generateArray() {
+    let newArray = [];
 
-  for (let i = 0; i < arraySize; i++) {
-    newArray.push({
-      id: crypto.randomUUID(),
-      value: Math.floor(Math.random() * 300) + 20,
-    });
+    // Random Array
+    for (let i = 0; i < arraySize; i++) {
+      newArray.push({
+        id: crypto.randomUUID(),
+        value: Math.floor(Math.random() * 300) + 20,
+      });
+    }
+
+    // Nearly Sorted
+    if (arrayType === "nearly") {
+      newArray.sort((a, b) => a.value - b.value);
+
+      for (let i = 0; i < 5; i++) {
+        const a = Math.floor(Math.random() * arraySize);
+        const b = Math.floor(Math.random() * arraySize);
+
+        [newArray[a], newArray[b]] = [newArray[b], newArray[a]];
+      }
+    }
+
+    // Reversed
+    if (arrayType === "reversed") {
+      newArray.sort((a, b) => b.value - a.value);
+    }
+
+    // Few Unique Values
+    if (arrayType === "few") {
+      newArray = [];
+
+      for (let i = 0; i < arraySize; i++) {
+        newArray.push({
+          id: crypto.randomUUID(),
+          value: [40, 80, 120, 160, 200][
+            Math.floor(Math.random() * 5)
+          ],
+        });
+      }
+    }
+
+    setArray(newArray);
+    setActiveBars([]);
+    setSwappingBars([]);
+    setSortedBars([]);
+
+    setComparisons(0);
+    setSwaps(0);
+    setElapsedTime(0);
+    setCurrentLine(0);
   }
-
-  setArray(newArray);
-  setActiveBars([]);
-  setSwappingBars([]);
-  setSortedBars([]);
-}
 
   useEffect(() => {
     generateArray();
-  }, [arraySize]);
+  }, [arraySize, arrayType]);
 
   return (
     <div className="grid-bg min-h-screen">
       <Navbar />
 
-      <div className="max-w-7xl mx-auto px-6 py-6">
+      <div className="max-w-[1700px] mx-auto px-5 py-3">
 
-        {/* Algorithm Tabs */}
         <AlgorithmTabs
           selectedAlgorithm={selectedAlgorithm}
           setSelectedAlgorithm={setSelectedAlgorithm}
         />
 
-        {/* Controls */}
-<div className="mt-6">
-  <Controls
-    generateArray={generateArray}
+        <div className="mt-3">
+          <Controls
+            generateArray={generateArray}
 
-    bubbleSort={() => {
-      setSelectedAlgorithm("bubble");
+            bubbleSort={() => {
+              setSelectedAlgorithm("bubble");
 
-      bubbleSort(
-        array,
-        setArray,
-        speed,
-        setActiveBars,
-        setSwappingBars,
-        setSortedBars,
-        setIsSorting,
-        setComparisons,
-        setSwaps,
-        setElapsedTime,
-        setCurrentLine
-      );
-    }}
+              bubbleSort(
+  array,
+  setArray,
+  speed,
+  setActiveBars,
+  setSwappingBars,
+  setSortedBars,
+  setIsSorting,
+  setComparisons,
+  setSwaps,
+  setElapsedTime,
+  setCurrentLine,
+  setProgress,
+  () => isPaused
+);
+            }}
 
-    selectionSort={() => {
-      setSelectedAlgorithm("selection");
+            selectionSort={() => {
+              setSelectedAlgorithm("selection");
 
-      selectionSort(
-        array,
-        setArray,
-        speed,
-        setActiveBars,
-        setSortedBars,
-        setIsSorting
-      );
-    }}
+              selectionSort(
+  array,
+  setArray,
+  speed,
+  setActiveBars,
+  setSwappingBars,
+  setMinBar,
+  setSortedBars,
+  setIsSorting,
+  setComparisons,
+  setSwaps,
+  setElapsedTime,
+  setCurrentLine,
+  setProgress,
+  () => isPaused
+);        }}
 
-    arraySize={arraySize}
-    setArraySize={setArraySize}
-    speed={speed}
-    setSpeed={setSpeed}
-    isSorting={isSorting}
-    isPaused={isPaused}
-    setIsPaused={setIsPaused}
-  />
-</div>
-              
+            arraySize={arraySize}
+            setArraySize={setArraySize}
 
-            
+            speed={speed}
+            setSpeed={setSpeed}
 
-        {/* Dashboard */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
+            arrayType={arrayType}
+            setArrayType={setArrayType}
 
-          {/* Visualization */}
+            isSorting={isSorting}
+
+            isPaused={isPaused}
+            setIsPaused={setIsPaused}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
+
+          {/* Left Side */}
           <div className="lg:col-span-2">
+
             <SortingVisualizer
   array={array}
   activeBars={activeBars}
   swappingBars={swappingBars}
   sortedBars={sortedBars}
+  minBar={minBar}
 />
-<div className="mt-6">
-  <TracePanel
-  algorithm={selectedAlgorithm}
-  currentLine={currentLine}
-/>
-</div>
+            <div className="mt-3">
+              <TracePanel
+                algorithm={selectedAlgorithm}
+                currentLine={currentLine}
+              />
+            </div>
+
           </div>
 
-          {/* Right Sidebar */}
+          {/* Right Side */}
           <Sidebar
   selectedAlgorithm={selectedAlgorithm}
   comparisons={comparisons}
   swaps={swaps}
   elapsedTime={elapsedTime}
+  sortedCount={sortedBars.length}
+  totalBars={array.length}
+  progress={progress}
 />
 
         </div>

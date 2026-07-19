@@ -18,18 +18,20 @@ function TracePanel({
     },
 
     selection: {
-      best: "O(n²)",
-      average: "O(n²)",
-      worst: "O(n²)",
-      space: "O(1)",
+  best: "O(n²)",
+  average: "O(n²)",
+  worst: "O(n²)",
+  space: "O(1)",
 
-      code: [
-        "for i = 0 to n-1",
-        "min = i",
-        "find smallest element",
-        "swap(min, i)",
-      ],
-    },
+  code: [
+    "for i = 0 to n-1",
+    "min = i",
+    "for j = i+1 to n-1",
+    "if arr[j] < arr[min]",
+    "min = j",
+    "swap(arr[i], arr[min])",
+  ],
+},
   };
 
   const current = algorithms[algorithm];

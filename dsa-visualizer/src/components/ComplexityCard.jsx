@@ -1,36 +1,75 @@
-import algorithmInfo from "../data/algorithmInfo";
-
 function ComplexityCard({ algorithm }) {
-  const info = algorithmInfo[algorithm];
+  const data = {
+    bubble: {
+      name: "Bubble Sort",
+      best: "O(n)",
+      average: "O(n²)",
+      worst: "O(n²)",
+      space: "O(1)",
+      stable: "Yes",
+      inplace: "Yes",
+    },
+    selection: {
+      name: "Selection Sort",
+      best: "O(n²)",
+      average: "O(n²)",
+      worst: "O(n²)",
+      space: "O(1)",
+      stable: "No",
+      inplace: "Yes",
+    },
+  };
+
+  const algo = data[algorithm];
 
   return (
-    <div className="max-w-md mx-auto mt-8 bg-slate-800 rounded-xl shadow-lg p-6 text-white">
+    <div className="bg-[#102235] border border-slate-700 rounded-2xl p-4 shadow-xl">
 
-      <h2 className="text-2xl font-bold text-cyan-400 mb-4">
-        {info.name}
+      <h2 className="text-lg font-bold text-cyan-300 mb-3">
+        {algo.name}
       </h2>
 
-      <div className="space-y-2">
+      <div className="space-y-2 text-sm">
 
-        <p>
-          <span className="font-semibold">Best Case:</span> {info.best}
-        </p>
+        <div className="flex justify-between">
+          <span>Best</span>
+          <span className="text-green-400">{algo.best}</span>
+        </div>
 
-        <p>
-          <span className="font-semibold">Average Case:</span> {info.average}
-        </p>
+        <div className="flex justify-between">
+          <span>Average</span>
+          <span className="text-yellow-400">{algo.average}</span>
+        </div>
 
-        <p>
-          <span className="font-semibold">Worst Case:</span> {info.worst}
-        </p>
+        <div className="flex justify-between">
+          <span>Worst</span>
+          <span className="text-red-400">{algo.worst}</span>
+        </div>
 
-        <p>
-          <span className="font-semibold">Space Complexity:</span> {info.space}
-        </p>
+        <div className="flex justify-between">
+          <span>Space</span>
+          <span className="text-cyan-400">{algo.space}</span>
+        </div>
 
-        <p>
-          <span className="font-semibold">Stable:</span> {info.stable}
-        </p>
+      </div>
+
+      <div className="border-t border-slate-700 my-3"></div>
+
+      <div className="flex justify-between text-sm">
+
+        <div>
+          <span className="text-slate-400">Stable</span>
+          <p className="font-semibold text-green-400">
+            {algo.stable}
+          </p>
+        </div>
+
+        <div>
+          <span className="text-slate-400">In-place</span>
+          <p className="font-semibold text-green-400">
+            {algo.inplace}
+          </p>
+        </div>
 
       </div>
 

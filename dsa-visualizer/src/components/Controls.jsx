@@ -6,83 +6,74 @@ function Controls({
   setArraySize,
   speed,
   setSpeed,
+  arrayType,
+  setArrayType,
   isSorting,
   isPaused,
   setIsPaused,
 }) {
   return (
-    <div className="bg-slate-800 rounded-xl shadow-lg p-6 mt-8 mx-auto max-w-6xl">
+    <div className="bg-[#102235] border border-slate-700 rounded-2xl shadow-xl p-4">
 
-      {/* Buttons */}
-      <div className="flex flex-wrap justify-center gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-6">
 
-        {/* Generate Array */}
-        <button
-          onClick={generateArray}
-          disabled={isSorting}
-          className={`px-5 py-2 rounded-lg font-semibold transition ${
-            isSorting
-              ? "bg-gray-500 text-gray-300 cursor-not-allowed opacity-60"
-              : "bg-cyan-500 hover:bg-cyan-600 text-white"
-          }`}
-        >
-          Generate Array
-        </button>
+        {/* Buttons */}
+        <div className="flex flex-wrap gap-3">
 
-        {/* Bubble Sort */}
-        <button
-          onClick={bubbleSort}
-          disabled={isSorting}
-          className={`px-5 py-2 rounded-lg font-semibold transition ${
-            isSorting
-              ? "bg-gray-500 text-gray-300 cursor-not-allowed opacity-60"
-              : "bg-emerald-500 hover:bg-emerald-600 text-white"
-          }`}
-        >
-          Bubble Sort
-        </button>
-<button
-  onClick={() => setIsPaused(!isPaused)}
-  disabled={!isSorting}
-  className={`px-5 py-2 rounded-lg font-semibold transition ${
-    !isSorting
-      ? "bg-gray-500 text-gray-300 cursor-not-allowed opacity-60"
-      : "bg-yellow-500 hover:bg-yellow-600 text-white"
-  }`}
->
-  {isPaused ? "Resume" : "Pause"}
-</button>
-        {/* Selection Sort */}
-        <button
-          onClick={selectionSort}
-          disabled={isSorting}
-          className={`px-5 py-2 rounded-lg font-semibold transition ${
-            isSorting
-              ? "bg-gray-500 text-gray-300 cursor-not-allowed opacity-60"
-              : "bg-orange-500 hover:bg-orange-600 text-white"
-          }`}
-        >
-          Selection Sort
-        </button>
+          <button
+            onClick={generateArray}
+            disabled={isSorting}
+            className={`px-4 py-2 rounded-lg font-semibold transition ${
+              isSorting
+                ? "bg-gray-600 text-gray-300 cursor-not-allowed"
+                : "bg-cyan-500 hover:bg-cyan-600 text-white"
+            }`}
+          >
+            Generate
+          </button>
 
-        {/* Insertion Sort */}
-        <button
-          disabled
-          className="bg-purple-500 text-white px-5 py-2 rounded-lg font-semibold opacity-60 cursor-not-allowed"
-        >
-          Insertion Sort (Coming Soon)
-        </button>
+          <button
+            onClick={bubbleSort}
+            disabled={isSorting}
+            className={`px-4 py-2 rounded-lg font-semibold transition ${
+              isSorting
+                ? "bg-gray-600 text-gray-300 cursor-not-allowed"
+                : "bg-emerald-500 hover:bg-emerald-600 text-white"
+            }`}
+          >
+            Bubble
+          </button>
 
-      </div>
+          <button
+            onClick={selectionSort}
+            disabled={isSorting}
+            className={`px-4 py-2 rounded-lg font-semibold transition ${
+              isSorting
+                ? "bg-gray-600 text-gray-300 cursor-not-allowed"
+                : "bg-orange-500 hover:bg-orange-600 text-white"
+            }`}
+          >
+            Selection
+          </button>
 
-      {/* Sliders */}
-      <div className="mt-8 space-y-6">
+          <button
+            onClick={() => setIsPaused(!isPaused)}
+            disabled={!isSorting}
+            className={`px-4 py-2 rounded-lg font-semibold transition ${
+              !isSorting
+                ? "bg-gray-600 text-gray-300 cursor-not-allowed"
+                : "bg-yellow-500 hover:bg-yellow-600 text-white"
+            }`}
+          >
+            {isPaused ? "Resume" : "Pause"}
+          </button>
+
+        </div>
 
         {/* Array Size */}
-        <div>
-          <label className="block text-white font-semibold mb-2">
-            Array Size: {arraySize}
-          </label>
+        <div className="flex items-center gap-3">
+
+          <span className="text-white font-medium">Size</span>
 
           <input
             type="range"
@@ -90,16 +81,20 @@ function Controls({
             max="80"
             value={arraySize}
             onChange={(e) => setArraySize(Number(e.target.value))}
-            className="w-full cursor-pointer"
             disabled={isSorting}
+            className="w-32"
           />
+
+          <span className="text-cyan-300 w-8 text-center">
+            {arraySize}
+          </span>
+
         </div>
 
         {/* Speed */}
-        <div>
-          <label className="block text-white font-semibold mb-2">
-            Speed: {speed} ms
-          </label>
+        <div className="flex items-center gap-3">
+
+          <span className="text-white font-medium">Speed</span>
 
           <input
             type="range"
@@ -107,9 +102,35 @@ function Controls({
             max="300"
             value={speed}
             onChange={(e) => setSpeed(Number(e.target.value))}
-            className="w-full cursor-pointer"
             disabled={isSorting}
+            className="w-32"
           />
+
+          <span className="text-cyan-300 w-10 text-center">
+            {speed}
+          </span>
+
+        </div>
+
+        {/* Array Type Dropdown */}
+        <div className="flex items-center gap-3">
+
+          <span className="text-white font-medium">
+            Array
+          </span>
+
+          <select
+            value={arrayType}
+            onChange={(e) => setArrayType(e.target.value)}
+            disabled={isSorting}
+            className="bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white"
+          >
+            <option value="random">Random</option>
+            <option value="nearly">Nearly Sorted</option>
+            <option value="reversed">Reversed</option>
+            <option value="few">Few Unique</option>
+          </select>
+
         </div>
 
       </div>
