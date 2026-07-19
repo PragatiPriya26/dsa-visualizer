@@ -21,7 +21,6 @@ function App() {
   const [sortedBars, setSortedBars] = useState([]);
 
   const [isSorting, setIsSorting] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
 
   const [selectedAlgorithm, setSelectedAlgorithm] = useState("bubble");
 
@@ -29,7 +28,7 @@ function App() {
   const [swaps, setSwaps] = useState(0);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [currentLine, setCurrentLine] = useState(0);
-const [progress, setProgress] = useState(0);
+  const [progress, setProgress] = useState(0);
 
   function generateArray() {
     let newArray = [];
@@ -59,7 +58,7 @@ const [progress, setProgress] = useState(0);
       newArray.sort((a, b) => b.value - a.value);
     }
 
-    // Few Unique Values
+    // Few Unique
     if (arrayType === "few") {
       newArray = [];
 
@@ -77,11 +76,13 @@ const [progress, setProgress] = useState(0);
     setActiveBars([]);
     setSwappingBars([]);
     setSortedBars([]);
+    setMinBar(-1);
 
     setComparisons(0);
     setSwaps(0);
     setElapsedTime(0);
     setCurrentLine(0);
+    setProgress(0);
   }
 
   useEffect(() => {
@@ -107,41 +108,40 @@ const [progress, setProgress] = useState(0);
               setSelectedAlgorithm("bubble");
 
               bubbleSort(
-  array,
-  setArray,
-  speed,
-  setActiveBars,
-  setSwappingBars,
-  setSortedBars,
-  setIsSorting,
-  setComparisons,
-  setSwaps,
-  setElapsedTime,
-  setCurrentLine,
-  setProgress,
-  () => isPaused
-);
+                array,
+                setArray,
+                speed,
+                setActiveBars,
+                setSwappingBars,
+                setSortedBars,
+                setIsSorting,
+                setComparisons,
+                setSwaps,
+                setElapsedTime,
+                setCurrentLine,
+                setProgress
+              );
             }}
 
             selectionSort={() => {
               setSelectedAlgorithm("selection");
 
               selectionSort(
-  array,
-  setArray,
-  speed,
-  setActiveBars,
-  setSwappingBars,
-  setMinBar,
-  setSortedBars,
-  setIsSorting,
-  setComparisons,
-  setSwaps,
-  setElapsedTime,
-  setCurrentLine,
-  setProgress,
-  () => isPaused
-);        }}
+                array,
+                setArray,
+                speed,
+                setActiveBars,
+                setSwappingBars,
+                setMinBar,
+                setSortedBars,
+                setIsSorting,
+                setComparisons,
+                setSwaps,
+                setElapsedTime,
+                setCurrentLine,
+                setProgress
+              );
+            }}
 
             arraySize={arraySize}
             setArraySize={setArraySize}
@@ -153,9 +153,6 @@ const [progress, setProgress] = useState(0);
             setArrayType={setArrayType}
 
             isSorting={isSorting}
-
-            isPaused={isPaused}
-            setIsPaused={setIsPaused}
           />
         </div>
 
@@ -165,12 +162,13 @@ const [progress, setProgress] = useState(0);
           <div className="lg:col-span-2">
 
             <SortingVisualizer
-  array={array}
-  activeBars={activeBars}
-  swappingBars={swappingBars}
-  sortedBars={sortedBars}
-  minBar={minBar}
-/>
+              array={array}
+              activeBars={activeBars}
+              swappingBars={swappingBars}
+              sortedBars={sortedBars}
+              minBar={minBar}
+            />
+
             <div className="mt-3">
               <TracePanel
                 algorithm={selectedAlgorithm}
@@ -182,14 +180,14 @@ const [progress, setProgress] = useState(0);
 
           {/* Right Side */}
           <Sidebar
-  selectedAlgorithm={selectedAlgorithm}
-  comparisons={comparisons}
-  swaps={swaps}
-  elapsedTime={elapsedTime}
-  sortedCount={sortedBars.length}
-  totalBars={array.length}
-  progress={progress}
-/>
+            selectedAlgorithm={selectedAlgorithm}
+            comparisons={comparisons}
+            swaps={swaps}
+            elapsedTime={elapsedTime}
+            sortedCount={sortedBars.length}
+            totalBars={array.length}
+            progress={progress}
+          />
 
         </div>
 

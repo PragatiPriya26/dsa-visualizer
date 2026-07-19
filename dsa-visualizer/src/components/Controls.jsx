@@ -9,8 +9,6 @@ function Controls({
   arrayType,
   setArrayType,
   isSorting,
-  isPaused,
-  setIsPaused,
 }) {
   return (
     <div className="bg-[#102235] border border-slate-700 rounded-2xl shadow-xl p-4">
@@ -56,24 +54,14 @@ function Controls({
             Selection
           </button>
 
-          <button
-            onClick={() => setIsPaused(!isPaused)}
-            disabled={!isSorting}
-            className={`px-4 py-2 rounded-lg font-semibold transition ${
-              !isSorting
-                ? "bg-gray-600 text-gray-300 cursor-not-allowed"
-                : "bg-yellow-500 hover:bg-yellow-600 text-white"
-            }`}
-          >
-            {isPaused ? "Resume" : "Pause"}
-          </button>
-
         </div>
 
         {/* Array Size */}
         <div className="flex items-center gap-3">
 
-          <span className="text-white font-medium">Size</span>
+          <span className="text-white font-medium">
+            Size
+          </span>
 
           <input
             type="range"
@@ -82,7 +70,7 @@ function Controls({
             value={arraySize}
             onChange={(e) => setArraySize(Number(e.target.value))}
             disabled={isSorting}
-            className="w-32"
+            className="w-32 accent-cyan-500"
           />
 
           <span className="text-cyan-300 w-8 text-center">
@@ -94,7 +82,9 @@ function Controls({
         {/* Speed */}
         <div className="flex items-center gap-3">
 
-          <span className="text-white font-medium">Speed</span>
+          <span className="text-white font-medium">
+            Speed
+          </span>
 
           <input
             type="range"
@@ -103,7 +93,7 @@ function Controls({
             value={speed}
             onChange={(e) => setSpeed(Number(e.target.value))}
             disabled={isSorting}
-            className="w-32"
+            className="w-32 accent-cyan-500"
           />
 
           <span className="text-cyan-300 w-10 text-center">
@@ -112,7 +102,7 @@ function Controls({
 
         </div>
 
-        {/* Array Type Dropdown */}
+        {/* Array Type */}
         <div className="flex items-center gap-3">
 
           <span className="text-white font-medium">
@@ -123,7 +113,7 @@ function Controls({
             value={arrayType}
             onChange={(e) => setArrayType(e.target.value)}
             disabled={isSorting}
-            className="bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white"
+            className="bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
           >
             <option value="random">Random</option>
             <option value="nearly">Nearly Sorted</option>

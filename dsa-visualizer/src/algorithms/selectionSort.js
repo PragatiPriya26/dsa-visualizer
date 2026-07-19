@@ -11,8 +11,7 @@ export async function selectionSort(
   setSwaps,
   setElapsedTime,
   setCurrentLine,
-  setProgress,
-  isPaused
+  setProgress
 ) {
   const arr = [...array];
 
@@ -24,13 +23,12 @@ export async function selectionSort(
   setComparisons(0);
   setSwaps(0);
   setElapsedTime(0);
+  setProgress(0);
 
   setSortedBars([]);
   setActiveBars([]);
   setSwappingBars([]);
   setMinBar(-1);
-
-  setProgress(0);
 
   setIsSorting(true);
 
@@ -51,7 +49,7 @@ export async function selectionSort(
       setCurrentLine(3);
 
       setActiveBars([minIndex, j]);
-await waitIfPaused();
+
       await new Promise(resolve =>
         setTimeout(resolve, speed)
       );
@@ -75,26 +73,24 @@ await waitIfPaused();
       setActiveBars([]);
     }
 
-    // Swap only if needed
     if (minIndex !== i) {
 
       // Line 6
       setCurrentLine(6);
 
       setSwappingBars([i, minIndex]);
-await waitIfPaused();
+
       await new Promise(resolve =>
         setTimeout(resolve, speed)
       );
 
-      [arr[i], arr[minIndex]] =
-        [arr[minIndex], arr[i]];
+      [arr[i], arr[minIndex]] = [arr[minIndex], arr[i]];
 
       swaps++;
       setSwaps(swaps);
 
       setArray([...arr]);
-await waitIfPaused();
+
       await new Promise(resolve =>
         setTimeout(resolve, speed)
       );
@@ -113,12 +109,9 @@ await waitIfPaused();
 
   const end = performance.now();
 
-  setElapsedTime(
-    Math.round(end - start)
-  );
+  setElapsedTime(Math.round(end - start));
 
   setCurrentLine(0);
-
   setActiveBars([]);
   setSwappingBars([]);
   setMinBar(-1);
