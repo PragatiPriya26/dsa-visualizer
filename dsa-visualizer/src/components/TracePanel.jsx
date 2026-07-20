@@ -32,6 +32,19 @@ function TracePanel({
     "swap(arr[i], arr[min])",
   ],
 },
+insertion: {
+  best: "O(n)",
+  average: "O(n²)",
+  worst: "O(n²)",
+  space: "O(1)",
+
+  code: [
+  "for i = 1 to n-1",
+  "while j >= 0 && arr[j] > key",
+  "shift arr[j] to arr[j+1]",
+  "insert key at correct position",
+]
+},
   };
 
   const current = algorithms[algorithm];

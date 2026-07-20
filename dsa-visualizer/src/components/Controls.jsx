@@ -2,6 +2,7 @@ function Controls({
   generateArray,
   bubbleSort,
   selectionSort,
+  insertionSort,
   arraySize,
   setArraySize,
   speed,
@@ -55,7 +56,17 @@ function Controls({
           </button>
 
         </div>
-
+<button
+  onClick={insertionSort}
+  disabled={isSorting}
+  className={`px-4 py-2 rounded-lg font-semibold transition ${
+    isSorting
+      ? "bg-gray-600 text-gray-300 cursor-not-allowed"
+      : "bg-purple-500 hover:bg-purple-600 text-white"
+  }`}
+>
+  Insertion
+</button>
         {/* Array Size */}
         <div className="flex items-center gap-3">
 

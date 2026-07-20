@@ -8,6 +8,7 @@ import TracePanel from "./components/TracePanel";
 
 import { bubbleSort } from "./algorithms/bubbleSort";
 import { selectionSort } from "./algorithms/selectionSort";
+import { insertionSort } from "./algorithms/insertionSort";
 
 function App() {
   const [array, setArray] = useState([]);
@@ -142,7 +143,25 @@ function App() {
                 setProgress
               );
             }}
+insertionSort={() => {
+  setSelectedAlgorithm("insertion");
 
+  insertionSort(
+    array,
+    setArray,
+    speed,
+    setActiveBars,
+    setSwappingBars,
+    setMinBar,
+    setSortedBars,
+    setIsSorting,
+    setComparisons,
+    setSwaps,
+    setElapsedTime,
+    setCurrentLine,
+    setProgress
+  );
+}}
             arraySize={arraySize}
             setArraySize={setArraySize}
 
@@ -162,13 +181,13 @@ function App() {
           <div className="lg:col-span-2">
 
             <SortingVisualizer
-              array={array}
-              activeBars={activeBars}
-              swappingBars={swappingBars}
-              sortedBars={sortedBars}
-              minBar={minBar}
-            />
-
+  array={array}
+  activeBars={activeBars}
+  swappingBars={swappingBars}
+  sortedBars={sortedBars}
+  minBar={minBar}
+  selectedAlgorithm={selectedAlgorithm}
+/>
             <div className="mt-3">
               <TracePanel
                 algorithm={selectedAlgorithm}

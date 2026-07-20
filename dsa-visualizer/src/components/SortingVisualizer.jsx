@@ -46,6 +46,7 @@ function SortingVisualizer({
   swappingBars={swappingBars}
   sortedBars={sortedBars}
   minBar={minBar}
+  selectedAlgorithm={selectedAlgorithm}
 />
         </div>
 

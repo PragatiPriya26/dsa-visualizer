@@ -9,6 +9,7 @@ function ComplexityCard({ algorithm }) {
       stable: "Yes",
       inplace: "Yes",
     },
+
     selection: {
       name: "Selection Sort",
       best: "O(n²)",
@@ -18,9 +19,19 @@ function ComplexityCard({ algorithm }) {
       stable: "No",
       inplace: "Yes",
     },
+
+    insertion: {
+      name: "Insertion Sort",
+      best: "O(n)",
+      average: "O(n²)",
+      worst: "O(n²)",
+      space: "O(1)",
+      stable: "Yes",
+      inplace: "Yes",
+    },
   };
 
-  const algo = data[algorithm];
+  const algo = data[algorithm] || data.bubble;
 
   return (
     <div className="bg-[#102235] border border-slate-700 rounded-2xl p-4 shadow-xl">
