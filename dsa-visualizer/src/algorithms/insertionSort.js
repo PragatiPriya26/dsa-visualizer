@@ -11,7 +11,9 @@ export async function insertionSort(
   setSwaps,
   setElapsedTime,
   setCurrentLine,
-  setProgress
+  setProgress,
+  getIsPaused,
+  getStopSorting
 ) {
   const arr = [...array];
 
@@ -22,6 +24,12 @@ export async function insertionSort(
 
   const sleep = (ms) =>
     new Promise((resolve) => setTimeout(resolve, ms));
+
+  async function waitIfPaused() {
+    while (getIsPaused()) {
+      await sleep(100);
+    }
+  }
 
   setIsSorting(true);
 
@@ -36,6 +44,14 @@ export async function insertionSort(
   setMinBar(-1);
 
   for (let i = 1; i < arr.length; i++) {
+
+    if (getStopSorting()) {
+      setIsSorting(false);
+      return;
+    }
+
+    await waitIfPaused();
+
     setCurrentLine(1);
 
     const key = { ...arr[i] };
@@ -44,6 +60,14 @@ export async function insertionSort(
     setMinBar(i);
 
     while (j >= 0) {
+
+      if (getStopSorting()) {
+        setIsSorting(false);
+        return;
+      }
+
+      await waitIfPaused();
+
       setCurrentLine(2);
 
       setActiveBars([j, j + 1]);
@@ -53,7 +77,9 @@ export async function insertionSort(
 
       await sleep(speed);
 
-      if (arr[j].value <= key.value) break;
+      if (arr[j].value <= key.value) {
+        break;
+      }
 
       setCurrentLine(3);
 
@@ -79,26 +105,23 @@ export async function insertionSort(
 
     setArray([...arr]);
 
-    // Mark current portion as sorted
-    setSortedBars((prev) => {
-      const next = [...prev];
-      if (!next.includes(i)) {
-        next.push(i);
-      }
-      return next;
-    });
+    // Highlight sorted portion
+    setSortedBars(
+      Array.from({ length: i + 1 }, (_, k) => k)
+    );
 
     setProgress(
       Math.round(((i + 1) / arr.length) * 100)
     );
 
     setActiveBars([]);
+    setSwappingBars([]);
     setMinBar(-1);
 
     await sleep(speed);
   }
 
-  // Ensure all bars become green
+  // Final animation
   setSortedBars(
     Array.from({ length: arr.length }, (_, i) => i)
   );
@@ -106,14 +129,16 @@ export async function insertionSort(
   setArray([...arr]);
 
   setCurrentLine(0);
+
   setActiveBars([]);
   setSwappingBars([]);
   setMinBar(-1);
 
   setProgress(100);
 
-  const end = performance.now();
-  setElapsedTime(Math.round(end - start));
+  setElapsedTime(
+    Math.round(performance.now() - start)
+  );
 
   setIsSorting(false);
 }

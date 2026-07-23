@@ -10,38 +10,57 @@ export async function bubbleSort(
   setSwaps,
   setElapsedTime,
   setCurrentLine,
-  setProgress
+  setProgress,
+  getIsPaused,
+  getStopSorting
 ) {
-  const start = performance.now();
+  const arr = [...array];
 
   let comparisons = 0;
   let swaps = 0;
+
+  const start = performance.now();
+
+  const sleep = (ms) =>
+    new Promise((resolve) => setTimeout(resolve, ms));
+
+  async function waitIfPaused() {
+    while (getIsPaused()) {
+      await sleep(100);
+    }
+  }
+
+  setIsSorting(true);
 
   setComparisons(0);
   setSwaps(0);
   setElapsedTime(0);
   setProgress(0);
 
-  const arr = [...array];
-
-  setIsSorting(true);
   setSortedBars([]);
   setActiveBars([]);
   setSwappingBars([]);
 
   for (let i = 0; i < arr.length; i++) {
+
+    if (getStopSorting()) break;
+
+    await waitIfPaused();
+
     setCurrentLine(1);
 
     for (let j = 0; j < arr.length - i - 1; j++) {
+
+      if (getStopSorting()) break;
+
+      await waitIfPaused();
+
       setCurrentLine(2);
 
-      // Highlight comparing bars
       setActiveBars([j, j + 1]);
       setSwappingBars([]);
 
-      await new Promise((resolve) =>
-        setTimeout(resolve, speed)
-      );
+      await sleep(speed);
 
       comparisons++;
       setComparisons(comparisons);
@@ -49,16 +68,13 @@ export async function bubbleSort(
       setCurrentLine(3);
 
       if (arr[j].value > arr[j + 1].value) {
-        // Highlight swapping bars
+
         setSwappingBars([j, j + 1]);
 
-        await new Promise((resolve) =>
-          setTimeout(resolve, speed)
-        );
+        await sleep(speed);
 
         setCurrentLine(4);
 
-        // Swap
         [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
 
         swaps++;
@@ -66,9 +82,7 @@ export async function bubbleSort(
 
         setArray([...arr]);
 
-        await new Promise((resolve) =>
-          setTimeout(resolve, speed)
-        );
+        await sleep(speed);
 
         setSwappingBars([]);
       }
@@ -76,10 +90,8 @@ export async function bubbleSort(
       setActiveBars([]);
     }
 
-    // Mark one bar sorted
     setSortedBars((prev) => [...prev, arr.length - i - 1]);
 
-    // Update progress
     setProgress(
       Math.round(((i + 1) / arr.length) * 100)
     );
@@ -93,5 +105,6 @@ export async function bubbleSort(
   setActiveBars([]);
   setSwappingBars([]);
   setProgress(100);
+
   setIsSorting(false);
 }

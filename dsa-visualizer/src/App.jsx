@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Navbar from "./components/Navbar";
 import AlgorithmTabs from "./components/AlgorithmTabs";
 import Controls from "./components/Controls";
@@ -32,6 +32,8 @@ function App() {
   const [progress, setProgress] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 const [stopSorting, setStopSorting] = useState(false);
+const isPausedRef = useRef(false);
+const stopSortingRef = useRef(false);
 
   function generateArray() {
     let newArray = [];
@@ -83,75 +85,101 @@ const [stopSorting, setStopSorting] = useState(false);
     setElapsedTime(0);
     setCurrentLine(0);
     setProgress(0);
+    setStopSorting(false);
+setIsPaused(false);
+
+stopSortingRef.current = false;
+isPausedRef.current = false;
   }
 
   useEffect(() => {
     generateArray();
   }, [arraySize, arrayType]);
 
-  // ==========================
-  // START SORTING
-  // ==========================
   const startSorting = () => {
-    switch (selectedAlgorithm) {
-      case "bubble":
-        bubbleSort(
-          array,
-          setArray,
-          speed,
-          setActiveBars,
-          setSwappingBars,
-          setSortedBars,
-          setIsSorting,
-          setComparisons,
-          setSwaps,
-          setElapsedTime,
-          setCurrentLine,
-          setProgress
-        );
-        break;
+  setStopSorting(false);
+setIsPaused(false);
 
-      case "selection":
-        selectionSort(
-          array,
-          setArray,
-          speed,
-          setActiveBars,
-          setSwappingBars,
-          setMinBar,
-          setSortedBars,
-          setIsSorting,
-          setComparisons,
-          setSwaps,
-          setElapsedTime,
-          setCurrentLine,
-          setProgress
-        );
-        break;
+stopSortingRef.current = false;
+isPausedRef.current = false;
 
-      case "insertion":
-        insertionSort(
-          array,
-          setArray,
-          speed,
-          setActiveBars,
-          setSwappingBars,
-          setMinBar,
-          setSortedBars,
-          setIsSorting,
-          setComparisons,
-          setSwaps,
-          setElapsedTime,
-          setCurrentLine,
-          setProgress
-        );
-        break;
+  switch (selectedAlgorithm) {
+    case "bubble":
+      bubbleSort(
+        array,
+        setArray,
+        speed,
+        setActiveBars,
+        setSwappingBars,
+        setSortedBars,
+        setIsSorting,
+        setComparisons,
+        setSwaps,
+        setElapsedTime,
+        setCurrentLine,
+        setProgress,
+        () => isPausedRef.current,
+() => stopSortingRef.current
+      );
+      break;
 
-      default:
-        break;
-    }
-  };
+    case "selection":
+      selectionSort(
+        array,
+        setArray,
+        speed,
+        setActiveBars,
+        setSwappingBars,
+        setMinBar,
+        setSortedBars,
+        setIsSorting,
+        setComparisons,
+        setSwaps,
+        setElapsedTime,
+        setCurrentLine,
+        setProgress,
+        () => isPausedRef.current,
+() => stopSortingRef.current
+      );
+      break;
 
+    case "insertion":
+      insertionSort(
+        array,
+        setArray,
+        speed,
+        setActiveBars,
+        setSwappingBars,
+        setMinBar,
+        setSortedBars,
+        setIsSorting,
+        setComparisons,
+        setSwaps,
+        setElapsedTime,
+        setCurrentLine,
+        setProgress,
+        () => isPausedRef.current,
+() => stopSortingRef.current
+      );
+      break;
+
+    default:
+      break;
+  }
+};
+const togglePause = () => {
+  const next = !isPaused;
+
+  setIsPaused(next);
+  isPausedRef.current = next;
+};
+
+const resetSorting = () => {
+  stopSortingRef.current = true;
+  setStopSorting(true);
+
+  generateArray();
+};
   return (
     <div className="grid-bg min-h-screen">
       <Navbar />
@@ -165,23 +193,27 @@ const [stopSorting, setStopSorting] = useState(false);
 
         <div className="mt-3">
           <Controls
-            generateArray={generateArray}
-            startSorting={startSorting}
-            selectedAlgorithm={selectedAlgorithm}
-            setSelectedAlgorithm={setSelectedAlgorithm}
-            arraySize={arraySize}
-            setArraySize={setArraySize}
-            speed={speed}
-            setSpeed={setSpeed}
-            arrayType={arrayType}
-            setArrayType={setArrayType}
-            isSorting={isSorting}
-            isPaused={isPaused}
-setIsPaused={setIsPaused}
-stopSorting={stopSorting}
-setStopSorting={setStopSorting}
-          />
-        </div>
+  generateArray={generateArray}
+  startSorting={startSorting}
+
+  selectedAlgorithm={selectedAlgorithm}
+  setSelectedAlgorithm={setSelectedAlgorithm}
+
+  arraySize={arraySize}
+  setArraySize={setArraySize}
+
+  speed={speed}
+  setSpeed={setSpeed}
+
+  arrayType={arrayType}
+  setArrayType={setArrayType}
+
+  isSorting={isSorting}
+
+ isPaused={isPaused}
+togglePause={togglePause}
+resetSorting={resetSorting}
+/> </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
 

@@ -10,7 +10,10 @@ function Controls({
   arrayType,
   setArrayType,
   isSorting,
-}) {
+  isPaused,
+  togglePause,
+  resetSorting,
+})  {
   return (
     <div className="bg-[#102235] border border-slate-700 rounded-2xl shadow-xl p-4">
 
@@ -84,17 +87,14 @@ function Controls({
 
         </div>
         <button
-  onClick={() => setIsPaused(!isPaused)}
+  onClick={togglePause}
   disabled={!isSorting}
   className="px-4 py-2 rounded-lg bg-yellow-500 hover:bg-yellow-600 text-white font-semibold"
 >
   {isPaused ? "▶ Resume" : "⏸ Pause"}
 </button>
 <button
-  onClick={() => {
-    setStopSorting(true);
-    generateArray();
-  }}
+  onClick={resetSorting}
   className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white font-semibold"
 >
   ⟳ Reset
