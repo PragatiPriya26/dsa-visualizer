@@ -30,11 +30,12 @@ function App() {
   const [elapsedTime, setElapsedTime] = useState(0);
   const [currentLine, setCurrentLine] = useState(0);
   const [progress, setProgress] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+const [stopSorting, setStopSorting] = useState(false);
 
   function generateArray() {
     let newArray = [];
 
-    // Random Array
     for (let i = 0; i < arraySize; i++) {
       newArray.push({
         id: crypto.randomUUID(),
@@ -42,7 +43,6 @@ function App() {
       });
     }
 
-    // Nearly Sorted
     if (arrayType === "nearly") {
       newArray.sort((a, b) => a.value - b.value);
 
@@ -54,12 +54,10 @@ function App() {
       }
     }
 
-    // Reversed
     if (arrayType === "reversed") {
       newArray.sort((a, b) => b.value - a.value);
     }
 
-    // Few Unique
     if (arrayType === "few") {
       newArray = [];
 
@@ -74,6 +72,7 @@ function App() {
     }
 
     setArray(newArray);
+
     setActiveBars([]);
     setSwappingBars([]);
     setSortedBars([]);
@@ -90,6 +89,69 @@ function App() {
     generateArray();
   }, [arraySize, arrayType]);
 
+  // ==========================
+  // START SORTING
+  // ==========================
+  const startSorting = () => {
+    switch (selectedAlgorithm) {
+      case "bubble":
+        bubbleSort(
+          array,
+          setArray,
+          speed,
+          setActiveBars,
+          setSwappingBars,
+          setSortedBars,
+          setIsSorting,
+          setComparisons,
+          setSwaps,
+          setElapsedTime,
+          setCurrentLine,
+          setProgress
+        );
+        break;
+
+      case "selection":
+        selectionSort(
+          array,
+          setArray,
+          speed,
+          setActiveBars,
+          setSwappingBars,
+          setMinBar,
+          setSortedBars,
+          setIsSorting,
+          setComparisons,
+          setSwaps,
+          setElapsedTime,
+          setCurrentLine,
+          setProgress
+        );
+        break;
+
+      case "insertion":
+        insertionSort(
+          array,
+          setArray,
+          speed,
+          setActiveBars,
+          setSwappingBars,
+          setMinBar,
+          setSortedBars,
+          setIsSorting,
+          setComparisons,
+          setSwaps,
+          setElapsedTime,
+          setCurrentLine,
+          setProgress
+        );
+        break;
+
+      default:
+        break;
+    }
+  };
+
   return (
     <div className="grid-bg min-h-screen">
       <Navbar />
@@ -104,90 +166,36 @@ function App() {
         <div className="mt-3">
           <Controls
             generateArray={generateArray}
-
-            bubbleSort={() => {
-              setSelectedAlgorithm("bubble");
-
-              bubbleSort(
-                array,
-                setArray,
-                speed,
-                setActiveBars,
-                setSwappingBars,
-                setSortedBars,
-                setIsSorting,
-                setComparisons,
-                setSwaps,
-                setElapsedTime,
-                setCurrentLine,
-                setProgress
-              );
-            }}
-
-            selectionSort={() => {
-              setSelectedAlgorithm("selection");
-
-              selectionSort(
-                array,
-                setArray,
-                speed,
-                setActiveBars,
-                setSwappingBars,
-                setMinBar,
-                setSortedBars,
-                setIsSorting,
-                setComparisons,
-                setSwaps,
-                setElapsedTime,
-                setCurrentLine,
-                setProgress
-              );
-            }}
-insertionSort={() => {
-  setSelectedAlgorithm("insertion");
-
-  insertionSort(
-    array,
-    setArray,
-    speed,
-    setActiveBars,
-    setSwappingBars,
-    setMinBar,
-    setSortedBars,
-    setIsSorting,
-    setComparisons,
-    setSwaps,
-    setElapsedTime,
-    setCurrentLine,
-    setProgress
-  );
-}}
+            startSorting={startSorting}
+            selectedAlgorithm={selectedAlgorithm}
+            setSelectedAlgorithm={setSelectedAlgorithm}
             arraySize={arraySize}
             setArraySize={setArraySize}
-
             speed={speed}
             setSpeed={setSpeed}
-
             arrayType={arrayType}
             setArrayType={setArrayType}
-
             isSorting={isSorting}
+            isPaused={isPaused}
+setIsPaused={setIsPaused}
+stopSorting={stopSorting}
+setStopSorting={setStopSorting}
           />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
 
-          {/* Left Side */}
           <div className="lg:col-span-2">
 
             <SortingVisualizer
-  array={array}
-  activeBars={activeBars}
-  swappingBars={swappingBars}
-  sortedBars={sortedBars}
-  minBar={minBar}
-  selectedAlgorithm={selectedAlgorithm}
-/>
+              array={array}
+              activeBars={activeBars}
+              swappingBars={swappingBars}
+              sortedBars={sortedBars}
+              minBar={minBar}
+              selectedAlgorithm={selectedAlgorithm}
+            />
+
             <div className="mt-3">
               <TracePanel
                 algorithm={selectedAlgorithm}
@@ -197,7 +205,6 @@ insertionSort={() => {
 
           </div>
 
-          {/* Right Side */}
           <Sidebar
             selectedAlgorithm={selectedAlgorithm}
             comparisons={comparisons}

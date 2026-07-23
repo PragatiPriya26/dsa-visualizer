@@ -1,8 +1,8 @@
 function Controls({
   generateArray,
-  bubbleSort,
-  selectionSort,
-  insertionSort,
+  startSorting,
+  selectedAlgorithm,
+  setSelectedAlgorithm,
   arraySize,
   setArraySize,
   speed,
@@ -31,42 +31,36 @@ function Controls({
             Generate
           </button>
 
-          <button
-            onClick={bubbleSort}
-            disabled={isSorting}
-            className={`px-4 py-2 rounded-lg font-semibold transition ${
-              isSorting
-                ? "bg-gray-600 text-gray-300 cursor-not-allowed"
-                : "bg-emerald-500 hover:bg-emerald-600 text-white"
-            }`}
-          >
-            Bubble
-          </button>
+          <div className="flex items-center gap-3">
 
-          <button
-            onClick={selectionSort}
-            disabled={isSorting}
-            className={`px-4 py-2 rounded-lg font-semibold transition ${
-              isSorting
-                ? "bg-gray-600 text-gray-300 cursor-not-allowed"
-                : "bg-orange-500 hover:bg-orange-600 text-white"
-            }`}
-          >
-            Selection
-          </button>
+  <span className="text-white font-medium">
+    Algorithm
+  </span>
 
-        </div>
+  <select
+    value={selectedAlgorithm}
+    onChange={(e) => setSelectedAlgorithm(e.target.value)}
+    disabled={isSorting}
+    className="bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+  >
+    <option value="bubble">Bubble Sort</option>
+    <option value="selection">Selection Sort</option>
+    <option value="insertion">Insertion Sort</option>
+  </select>
+
+</div>
 <button
-  onClick={insertionSort}
+  onClick={startSorting}
   disabled={isSorting}
   className={`px-4 py-2 rounded-lg font-semibold transition ${
     isSorting
       ? "bg-gray-600 text-gray-300 cursor-not-allowed"
-      : "bg-purple-500 hover:bg-purple-600 text-white"
+      : "bg-emerald-500 hover:bg-emerald-600 text-white"
   }`}
 >
-  Insertion
+  ▶ Start
 </button>
+</div> 
         {/* Array Size */}
         <div className="flex items-center gap-3">
 
@@ -89,6 +83,22 @@ function Controls({
           </span>
 
         </div>
+        <button
+  onClick={() => setIsPaused(!isPaused)}
+  disabled={!isSorting}
+  className="px-4 py-2 rounded-lg bg-yellow-500 hover:bg-yellow-600 text-white font-semibold"
+>
+  {isPaused ? "▶ Resume" : "⏸ Pause"}
+</button>
+<button
+  onClick={() => {
+    setStopSorting(true);
+    generateArray();
+  }}
+  className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white font-semibold"
+>
+  ⟳ Reset
+</button>
 
         {/* Speed */}
         <div className="flex items-center gap-3">
