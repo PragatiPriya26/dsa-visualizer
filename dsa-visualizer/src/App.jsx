@@ -9,6 +9,7 @@ import TracePanel from "./components/TracePanel";
 import { bubbleSort } from "./algorithms/bubbleSort";
 import { selectionSort } from "./algorithms/selectionSort";
 import { insertionSort } from "./algorithms/insertionSort";
+import { mergeSort } from "./algorithms/mergeSort";
 
 function App() {
   const [array, setArray] = useState([]);
@@ -34,6 +35,7 @@ function App() {
 const [stopSorting, setStopSorting] = useState(false);
 const isPausedRef = useRef(false);
 const stopSortingRef = useRef(false);
+const [sortingFinished, setSortingFinished] = useState(false);
 
   function generateArray() {
     let newArray = [];
@@ -85,6 +87,7 @@ const stopSortingRef = useRef(false);
     setElapsedTime(0);
     setCurrentLine(0);
     setProgress(0);
+    setSortingFinished(false);
     setStopSorting(false);
 setIsPaused(false);
 
@@ -99,6 +102,7 @@ isPausedRef.current = false;
   const startSorting = () => {
   setStopSorting(false);
 setIsPaused(false);
+setSortingFinished(false);
 
 stopSortingRef.current = false;
 isPausedRef.current = false;
@@ -106,21 +110,22 @@ isPausedRef.current = false;
   switch (selectedAlgorithm) {
     case "bubble":
       bubbleSort(
-        array,
-        setArray,
-        speed,
-        setActiveBars,
-        setSwappingBars,
-        setSortedBars,
-        setIsSorting,
-        setComparisons,
-        setSwaps,
-        setElapsedTime,
-        setCurrentLine,
-        setProgress,
-        () => isPausedRef.current,
-() => stopSortingRef.current
-      );
+  array,
+  setArray,
+  speed,
+  setActiveBars,
+  setSwappingBars,
+  setSortedBars,
+  setIsSorting,
+  setComparisons,
+  setSwaps,
+  setElapsedTime,
+  setCurrentLine,
+  setProgress,
+  () => isPausedRef.current,
+  () => stopSortingRef.current,
+  setSortingFinished
+);
       break;
 
     case "selection":
@@ -139,7 +144,8 @@ isPausedRef.current = false;
         setCurrentLine,
         setProgress,
         () => isPausedRef.current,
-() => stopSortingRef.current
+() => stopSortingRef.current,
+setSortingFinished
       );
       break;
 
@@ -159,14 +165,35 @@ isPausedRef.current = false;
         setCurrentLine,
         setProgress,
         () => isPausedRef.current,
-() => stopSortingRef.current
+() => stopSortingRef.current,
+setSortingFinished
       );
       break;
 
-    default:
+  
+case "merge":
+  mergeSort(
+    array,
+    setArray,
+    speed,
+    setActiveBars,
+    setSwappingBars,
+    setSortedBars,
+    setIsSorting,
+    setComparisons,
+    setSwaps,
+    setElapsedTime,
+    setCurrentLine,
+    setProgress,
+    () => isPausedRef.current,
+    () => stopSortingRef.current,
+    setSortingFinished
+  );
+  break;
+  default:
       break;
   }
-};
+};  
 const togglePause = () => {
   const next = !isPaused;
 
@@ -174,9 +201,13 @@ const togglePause = () => {
   isPausedRef.current = next;
 };
 
-const resetSorting = () => {
+const resetSorting = async () => {
+  // Tell algorithms to stop
   stopSortingRef.current = true;
   setStopSorting(true);
+
+  // Wait one tick so the algorithm exits
+  await new Promise((resolve) => setTimeout(resolve, 50));
 
   generateArray();
 };
@@ -215,7 +246,21 @@ togglePause={togglePause}
 resetSorting={resetSorting}
 /> </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
+{sortingFinished && (
+  <div className="mt-4 rounded-2xl border border-emerald-500 bg-emerald-500/10 p-5 text-center shadow-lg animate-pulse">
+    <h2 className="text-2xl font-bold text-emerald-400">
+      🎉 Sorting Completed!
+    </h2>
+
+    <p className="mt-2 text-slate-300">
+      {selectedAlgorithm.charAt(0).toUpperCase() +
+        selectedAlgorithm.slice(1)}{" "}
+      Sort finished successfully.
+    </p>
+  </div>
+)}
+
+<div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
 
           <div className="lg:col-span-2">
 

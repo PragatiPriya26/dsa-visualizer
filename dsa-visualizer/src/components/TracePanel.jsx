@@ -45,9 +45,27 @@ insertion: {
   "insert key at correct position",
 ]
 },
+merge: {
+  best: "O(n log n)",
+  average: "O(n log n)",
+  worst: "O(n log n)",
+  space: "O(n)",
+
+  code: [
+    "mergeSort(arr, left, right)",
+    "mid = (left + right) / 2",
+    "mergeSort(left)",
+    "mergeSort(right)",
+    "merge(left, mid, right)",
+    "compare left[i] and right[j]",
+    "copy smaller element",
+    "copy remaining elements",
+  ],
+},
   };
 
-  const current = algorithms[algorithm];
+  const current = algorithms[algorithm] || algorithms.bubble;
+
 
   return (
     <div className="bg-[#102235] border border-slate-700 rounded-2xl shadow-xl overflow-hidden">

@@ -13,7 +13,8 @@ export async function insertionSort(
   setCurrentLine,
   setProgress,
   getIsPaused,
-  getStopSorting
+  getStopSorting,
+  setSortingFinished
 ) {
   const arr = [...array];
 
@@ -27,11 +28,14 @@ export async function insertionSort(
 
   async function waitIfPaused() {
     while (getIsPaused()) {
+      if (getStopSorting()) return false;
       await sleep(100);
     }
+    return true;
   }
 
   setIsSorting(true);
+  setSortingFinished(false);
 
   setComparisons(0);
   setSwaps(0);
@@ -46,11 +50,14 @@ export async function insertionSort(
   for (let i = 1; i < arr.length; i++) {
 
     if (getStopSorting()) {
-      setIsSorting(false);
+      cleanup();
       return;
     }
 
-    await waitIfPaused();
+    if (!(await waitIfPaused())) {
+      cleanup();
+      return;
+    }
 
     setCurrentLine(1);
 
@@ -62,11 +69,14 @@ export async function insertionSort(
     while (j >= 0) {
 
       if (getStopSorting()) {
-        setIsSorting(false);
+        cleanup();
         return;
       }
 
-      await waitIfPaused();
+      if (!(await waitIfPaused())) {
+        cleanup();
+        return;
+      }
 
       setCurrentLine(2);
 
@@ -77,9 +87,7 @@ export async function insertionSort(
 
       await sleep(speed);
 
-      if (arr[j].value <= key.value) {
-        break;
-      }
+      if (arr[j].value <= key.value) break;
 
       setCurrentLine(3);
 
@@ -99,13 +107,12 @@ export async function insertionSort(
       j--;
     }
 
-    setCurrentLine(4);
-
     arr[j + 1] = key;
+
+    setCurrentLine(4);
 
     setArray([...arr]);
 
-    // Highlight sorted portion
     setSortedBars(
       Array.from({ length: i + 1 }, (_, k) => k)
     );
@@ -121,18 +128,10 @@ export async function insertionSort(
     await sleep(speed);
   }
 
-  // Final animation
+  // Finished normally
   setSortedBars(
     Array.from({ length: arr.length }, (_, i) => i)
   );
-
-  setArray([...arr]);
-
-  setCurrentLine(0);
-
-  setActiveBars([]);
-  setSwappingBars([]);
-  setMinBar(-1);
 
   setProgress(100);
 
@@ -140,5 +139,22 @@ export async function insertionSort(
     Math.round(performance.now() - start)
   );
 
+  setCurrentLine(0);
+
+  setActiveBars([]);
+  setSwappingBars([]);
+  setMinBar(-1);
+
+  setSortingFinished(true);
   setIsSorting(false);
+
+  function cleanup() {
+    setCurrentLine(0);
+    setActiveBars([]);
+    setSwappingBars([]);
+    setSortedBars([]);
+    setMinBar(-1);
+    setProgress(0);
+    setIsSorting(false);
+  }
 }

@@ -29,6 +29,16 @@ function AlgorithmTabs({
               : "bg-slate-800 text-slate-300 hover:bg-slate-700"
           }`}
         >
+          <button
+  onClick={() => setSelectedAlgorithm("merge")}
+  className={`px-4 py-2 rounded-lg transition ${
+    selectedAlgorithm === "merge"
+      ? "bg-cyan-500 text-white"
+      : "bg-slate-700 text-slate-300"
+  }`}
+>
+  Merge Sort
+</button>
           {algo}
         </button>
 

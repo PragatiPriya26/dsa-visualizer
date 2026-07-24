@@ -27,6 +27,7 @@ export async function selectionSort(
 
   async function waitIfPaused() {
     while (getIsPaused()) {
+      if (getStopSorting()) return;
       await sleep(100);
     }
   }
@@ -46,11 +47,24 @@ export async function selectionSort(
   for (let i = 0; i < arr.length; i++) {
 
     if (getStopSorting()) {
+      setCurrentLine(0);
+      setActiveBars([]);
+      setSwappingBars([]);
+      setMinBar(-1);
       setIsSorting(false);
       return;
     }
 
     await waitIfPaused();
+
+    if (getStopSorting()) {
+      setCurrentLine(0);
+      setActiveBars([]);
+      setSwappingBars([]);
+      setMinBar(-1);
+      setIsSorting(false);
+      return;
+    }
 
     setCurrentLine(1);
 
@@ -62,11 +76,24 @@ export async function selectionSort(
     for (let j = i + 1; j < arr.length; j++) {
 
       if (getStopSorting()) {
+        setCurrentLine(0);
+        setActiveBars([]);
+        setSwappingBars([]);
+        setMinBar(-1);
         setIsSorting(false);
         return;
       }
 
       await waitIfPaused();
+
+      if (getStopSorting()) {
+        setCurrentLine(0);
+        setActiveBars([]);
+        setSwappingBars([]);
+        setMinBar(-1);
+        setIsSorting(false);
+        return;
+      }
 
       setCurrentLine(3);
 
@@ -80,7 +107,6 @@ export async function selectionSort(
       setCurrentLine(4);
 
       if (arr[j].value < arr[minIndex].value) {
-
         minIndex = j;
 
         setCurrentLine(5);
@@ -94,6 +120,15 @@ export async function selectionSort(
     if (minIndex !== i) {
 
       await waitIfPaused();
+
+      if (getStopSorting()) {
+        setCurrentLine(0);
+        setActiveBars([]);
+        setSwappingBars([]);
+        setMinBar(-1);
+        setIsSorting(false);
+        return;
+      }
 
       setCurrentLine(6);
 
@@ -115,7 +150,6 @@ export async function selectionSort(
 
     setMinBar(-1);
 
-    // Mark current index as sorted
     setSortedBars((prev) => [...prev, i]);
 
     setProgress(
@@ -123,12 +157,13 @@ export async function selectionSort(
     );
   }
 
-  // Ensure every bar is green
+  const end = performance.now();
+
+  setElapsedTime(Math.round(end - start));
+
   setSortedBars(
     Array.from({ length: arr.length }, (_, i) => i)
   );
-
-  setArray([...arr]);
 
   setCurrentLine(0);
   setActiveBars([]);
@@ -136,10 +171,6 @@ export async function selectionSort(
   setMinBar(-1);
 
   setProgress(100);
-
-  setElapsedTime(
-    Math.round(performance.now() - start)
-  );
 
   setIsSorting(false);
 }

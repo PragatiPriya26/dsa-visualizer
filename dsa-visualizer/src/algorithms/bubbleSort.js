@@ -12,7 +12,8 @@ export async function bubbleSort(
   setCurrentLine,
   setProgress,
   getIsPaused,
-  getStopSorting
+  getStopSorting,
+  setSortingFinished
 ) {
   const arr = [...array];
 
@@ -26,8 +27,24 @@ export async function bubbleSort(
 
   async function waitIfPaused() {
     while (getIsPaused()) {
+      if (getStopSorting()) {
+        return false;
+      }
+
       await sleep(100);
     }
+
+    return true;
+  }
+
+  function stopSortingCleanup() {
+    setActiveBars([]);
+    setSwappingBars([]);
+    setSortedBars([]);
+    setCurrentLine(0);
+    setProgress(0);
+    setSortingFinished(false);
+    setIsSorting(false);
   }
 
   setIsSorting(true);
@@ -36,6 +53,7 @@ export async function bubbleSort(
   setSwaps(0);
   setElapsedTime(0);
   setProgress(0);
+  setSortingFinished(false);
 
   setSortedBars([]);
   setActiveBars([]);
@@ -43,17 +61,33 @@ export async function bubbleSort(
 
   for (let i = 0; i < arr.length; i++) {
 
-    if (getStopSorting()) break;
+    if (getStopSorting()) {
+      stopSortingCleanup();
+      return;
+    }
 
-    await waitIfPaused();
+    const resume = await waitIfPaused();
+
+    if (!resume) {
+      stopSortingCleanup();
+      return;
+    }
 
     setCurrentLine(1);
 
     for (let j = 0; j < arr.length - i - 1; j++) {
 
-      if (getStopSorting()) break;
+      if (getStopSorting()) {
+        stopSortingCleanup();
+        return;
+      }
 
-      await waitIfPaused();
+      const resume = await waitIfPaused();
+
+      if (!resume) {
+        stopSortingCleanup();
+        return;
+      }
 
       setCurrentLine(2);
 
@@ -61,6 +95,11 @@ export async function bubbleSort(
       setSwappingBars([]);
 
       await sleep(speed);
+
+      if (getStopSorting()) {
+        stopSortingCleanup();
+        return;
+      }
 
       comparisons++;
       setComparisons(comparisons);
@@ -73,6 +112,11 @@ export async function bubbleSort(
 
         await sleep(speed);
 
+        if (getStopSorting()) {
+          stopSortingCleanup();
+          return;
+        }
+
         setCurrentLine(4);
 
         [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
@@ -83,6 +127,11 @@ export async function bubbleSort(
         setArray([...arr]);
 
         await sleep(speed);
+
+        if (getStopSorting()) {
+          stopSortingCleanup();
+          return;
+        }
 
         setSwappingBars([]);
       }
@@ -105,6 +154,12 @@ export async function bubbleSort(
   setActiveBars([]);
   setSwappingBars([]);
   setProgress(100);
+
+  setSortedBars(
+    Array.from({ length: arr.length }, (_, i) => i)
+  );
+
+  setSortingFinished(true);
 
   setIsSorting(false);
 }
