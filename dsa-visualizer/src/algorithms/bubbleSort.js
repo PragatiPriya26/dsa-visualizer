@@ -108,37 +108,30 @@ export async function bubbleSort(
 
       if (arr[j].value > arr[j + 1].value) {
 
-        setSwappingBars([j, j + 1]);
+  // Highlight the two bars
+  setSwappingBars([j, j + 1]);
 
-        await sleep(speed);
+  // Lift them
+  await sleep(speed * 0.8);
 
-        if (getStopSorting()) {
-          stopSortingCleanup();
-          return;
-        }
+  // Swap in the array
+  [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
 
-        setCurrentLine(4);
+  swaps++;
+  setSwaps(swaps);
 
-        [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+  // Update the UI
+  setArray([...arr]);
 
-        swaps++;
-        setSwaps(swaps);
+  // Allow Framer Motion to animate the movement
+  await sleep(speed * 1.2);
 
-        setArray([...arr]);
+  // Remove swap highlight
+  setSwappingBars([]);
+}
 
-        await sleep(speed);
-
-        if (getStopSorting()) {
-          stopSortingCleanup();
-          return;
-        }
-
-        setSwappingBars([]);
-      }
-
-      setActiveBars([]);
-    }
-
+// Clear comparison highlight after every comparison
+setActiveBars([]);}
     setSortedBars((prev) => [...prev, arr.length - i - 1]);
 
     setProgress(

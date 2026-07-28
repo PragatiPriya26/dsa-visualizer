@@ -38,20 +38,37 @@ function ArrayBars({
 
         return (
           <motion.div
-            key={bar.id}
-            layout
-            layoutId={bar.id}
-            transition={{
-              type: "spring",
-              stiffness: 300,
-              damping: 22,
-            }}
-            className={`rounded-t-xl transition-all duration-300 ${color} ${extraClass}`}
-            style={{
-              width: `${Math.max(6, 520 / array.length)}px`,
-              height: `${bar.value}px`,
-            }}
-          />
+  key={bar.id}
+  layout
+  layoutId={bar.id}
+  initial={false}
+  animate={{
+  scale: swappingBars.includes(index) ? 1.08 : 1,
+}}
+  transition={{
+  layout: {
+    type: "spring",
+    stiffness: 180,
+    damping: 22,
+    mass: 0.8,
+  },
+
+    scale: {
+      duration: 0.18,
+    },
+    y: {
+      duration: 0.18,
+    },
+    rotate: {
+      duration: 0.35,
+    },
+  }}
+  className={`rounded-t-xl ${color} ${extraClass}`}
+  style={{
+    width: `${Math.max(6, 520 / array.length)}px`,
+    height: `${bar.value}px`,
+  }}
+/>
         );
       })}
 
