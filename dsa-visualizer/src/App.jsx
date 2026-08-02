@@ -36,6 +36,10 @@ const [stopSorting, setStopSorting] = useState(false);
 const isPausedRef = useRef(false);
 const stopSortingRef = useRef(false);
 const [sortingFinished, setSortingFinished] = useState(false);
+const [swapAnimation, setSwapAnimation] = useState({
+  left: null,
+  right: null,
+});
 
   function generateArray() {
     let newArray = [];
