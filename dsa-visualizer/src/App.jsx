@@ -37,8 +37,8 @@ const isPausedRef = useRef(false);
 const stopSortingRef = useRef(false);
 const [sortingFinished, setSortingFinished] = useState(false);
 const [swapAnimation, setSwapAnimation] = useState({
-  left: null,
-  right: null,
+  leftId: null,
+  rightId: null,
 });
 
   function generateArray() {
@@ -113,7 +113,7 @@ isPausedRef.current = false;
 
   switch (selectedAlgorithm) {
     case "bubble":
-      bubbleSort(
+     bubbleSort(
   array,
   setArray,
   speed,
@@ -128,7 +128,8 @@ isPausedRef.current = false;
   setProgress,
   () => isPausedRef.current,
   () => stopSortingRef.current,
-  setSortingFinished
+  setSortingFinished,
+  setSwapAnimation
 );
       break;
 

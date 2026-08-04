@@ -7,7 +7,8 @@ function SortingVisualizer({
   sortedBars,
   minBar,
   selectedAlgorithm,
-}) {
+  swapAnimation,
+})  {
   return (
     <div className="mt-4">
       <div className="bg-[#102235] border border-slate-700 rounded-2xl shadow-2xl overflow-hidden">
@@ -56,14 +57,14 @@ function SortingVisualizer({
           <div className="absolute inset-0 opacity-5 pointer-events-none bg-[linear-gradient(to_right,#ffffff_1px,transparent_1px),linear-gradient(to_top,#ffffff_1px,transparent_1px)] bg-[size:45px_45px]"></div>
 
           <ArrayBars
-            array={array}
-            activeBars={activeBars}
-            swappingBars={swappingBars}
-            sortedBars={sortedBars}
-            minBar={minBar}
-            selectedAlgorithm={selectedAlgorithm}
-          />
-
+  array={array}
+  activeBars={activeBars}
+  swappingBars={swappingBars}
+  sortedBars={sortedBars}
+  minBar={minBar}
+  selectedAlgorithm={selectedAlgorithm}
+  swapAnimation={swapAnimation}
+/>
         </div>
 
       </div>

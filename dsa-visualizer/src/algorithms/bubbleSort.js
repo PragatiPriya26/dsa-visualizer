@@ -13,7 +13,8 @@ export async function bubbleSort(
   setProgress,
   getIsPaused,
   getStopSorting,
-  setSortingFinished
+  setSortingFinished,
+  setSwapAnimation
 ) {
   const arr = [...array];
 
@@ -108,27 +109,35 @@ export async function bubbleSort(
 
       if (arr[j].value > arr[j + 1].value) {
 
-  // Highlight the two bars
-  setSwappingBars([j, j + 1]);
+  // Highlight bars
+setSwappingBars([j, j + 1]);
 
-  // Lift them
-  await sleep(speed * 0.8);
+// Slide them horizontally
+setSwapAnimation({
+  left: j,
+  right: j + 1,
+});
 
-  // Swap in the array
-  [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+await sleep(speed);
 
-  swaps++;
-  setSwaps(swaps);
+// Actual swap
+[arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
 
-  // Update the UI
-  setArray([...arr]);
+swaps++;
+setSwaps(swaps);
 
-  // Allow Framer Motion to animate the movement
-  await sleep(speed * 1.2);
+setArray([...arr]);
 
-  // Remove swap highlight
-  setSwappingBars([]);
-}
+// Wait for layout animation
+await sleep(speed);
+
+// Clear animation state
+setSwapAnimation({
+  left: null,
+  right: null,
+});
+
+setSwappingBars([]);}
 
 // Clear comparison highlight after every comparison
 setActiveBars([]);}

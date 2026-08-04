@@ -6,6 +6,7 @@ function ArrayBars({
   swappingBars,
   sortedBars,
   minBar,
+  swapAnimation,
 }) {
   return (
     <div className="relative flex justify-center items-end h-[420px] gap-[3px] px-6 border-b-2 border-slate-700">
@@ -37,33 +38,33 @@ function ArrayBars({
         }
 
         return (
-          <motion.div
+         <motion.div
   key={bar.id}
   layout
   layoutId={bar.id}
   initial={false}
   animate={{
-  scale: swappingBars.includes(index) ? 1.08 : 1,
-}}
-  transition={{
-  layout: {
-    type: "spring",
-    stiffness: 180,
-    damping: 22,
-    mass: 0.8,
-  },
+    x:
+      swapAnimation?.left === index
+        ? 25
+        : swapAnimation?.right === index
+        ? -25
+        : 0,
 
-    scale: {
-      duration: 0.18,
+    scale: swappingBars.includes(index) ? 1.08 : 1,
+  }}
+  transition={{
+    x: {
+      duration: 0.25,
+      ease: "easeInOut",
     },
-    y: {
-      duration: 0.18,
-    },
-    rotate: {
-      duration: 0.35,
+    layout: {
+      type: "spring",
+      stiffness: 220,
+      damping: 24,
     },
   }}
-  className={`rounded-t-xl ${color} ${extraClass}`}
+  className={`rounded-t-xl transition-all duration-300 ${color} ${extraClass}`}
   style={{
     width: `${Math.max(6, 520 / array.length)}px`,
     height: `${bar.value}px`,
