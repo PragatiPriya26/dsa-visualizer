@@ -22,7 +22,7 @@ function ArrayBars({
         else if (swappingBars.includes(index)) {
           color = "bg-gradient-to-t from-orange-700 to-orange-400";
           extraClass =
-            "scale-125 shadow-2xl shadow-orange-500/80 border border-orange-300 z-20";
+  "scale-110 ring-2 ring-orange-300 shadow-2xl shadow-orange-500/80"
         }
 
         else if (minBar === index) {
@@ -36,35 +36,55 @@ function ArrayBars({
           extraClass =
             "scale-110 shadow-xl shadow-red-500/70";
         }
+const movingLeft =
+  swapAnimation?.leftId === bar.id;
 
+const movingRight =
+  swapAnimation?.rightId === bar.id;
         return (
-         <motion.div
+         
+  <motion.div
   key={bar.id}
   layout
   layoutId={bar.id}
   initial={false}
   animate={{
-    x:
-      swapAnimation?.left === index
-        ? 25
-        : swapAnimation?.right === index
-        ? -25
-        : 0,
+    y: movingLeft || movingRight ? -18 : 0,
 
-    scale: swappingBars.includes(index) ? 1.08 : 1,
+    scale: movingLeft || movingRight
+      ? 1.12
+      : activeBars.includes(index)
+      ? 1.05
+      : 1,
+
+    rotate:
+      movingLeft
+        ? -2
+        : movingRight
+        ? 2
+        : 0,
   }}
   transition={{
-    x: {
-      duration: 0.25,
-      ease: "easeInOut",
-    },
     layout: {
+      duration: 0.55,
       type: "spring",
-      stiffness: 220,
-      damping: 24,
+      stiffness: 170,
+      damping: 20,
+    },
+
+    y: {
+      duration: 0.22,
+    },
+
+    scale: {
+      duration: 0.2,
+    },
+
+    rotate: {
+      duration: 0.2,
     },
   }}
-  className={`rounded-t-xl transition-all duration-300 ${color} ${extraClass}`}
+  className={`rounded-t-xl ${color} ${extraClass}`}
   style={{
     width: `${Math.max(6, 520 / array.length)}px`,
     height: `${bar.value}px`,

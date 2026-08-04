@@ -46,6 +46,7 @@ export async function bubbleSort(
     setProgress(0);
     setSortingFinished(false);
     setIsSorting(false);
+    setSwapAnimation(null);
   }
 
   setIsSorting(true);
@@ -107,38 +108,35 @@ export async function bubbleSort(
 
       setCurrentLine(3);
 
-      if (arr[j].value > arr[j + 1].value) {
+     if (arr[j].value > arr[j + 1].value) {
 
-  // Highlight bars
-setSwappingBars([j, j + 1]);
+  // Highlight the two bars
+  setSwappingBars([j, j + 1]);
 
-// Slide them horizontally
-setSwapAnimation({
-  left: j,
-  right: j + 1,
-});
+  // Tell ArrayBars which bars are swapping
+  setSwapAnimation({
+    leftId: arr[j].id,
+    rightId: arr[j + 1].id,
+  });
 
-await sleep(speed);
+  // Small delay so the bars "prepare" to move
+  await sleep(speed * 0.65);
 
-// Actual swap
-[arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+  // Perform the swap
+  [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
 
-swaps++;
-setSwaps(swaps);
+  swaps++;
+  setSwaps(swaps);
 
-setArray([...arr]);
+  // Update array so Framer Motion animates the layout
+  setArray([...arr]);
 
-// Wait for layout animation
-await sleep(speed);
-
-// Clear animation state
-setSwapAnimation({
-  left: null,
-  right: null,
-});
-
-setSwappingBars([]);}
-
+  // Let the animation complete
+ await sleep(speed * 1.15);
+  // Clear animation
+  setSwapAnimation(null);
+  setSwappingBars([]);
+}
 // Clear comparison highlight after every comparison
 setActiveBars([]);}
     setSortedBars((prev) => [...prev, arr.length - i - 1]);
