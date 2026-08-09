@@ -19,7 +19,7 @@ export async function insertionSort(
   const arr = [...array];
 
   let comparisons = 0;
-  let shifts = 0;
+  let swaps = 0;
 
   const start = performance.now();
 
@@ -27,8 +27,9 @@ export async function insertionSort(
     new Promise((resolve) => setTimeout(resolve, ms));
 
   // ---------------------------------------------
-  // PAUSE HANDLER
+  // PAUSE / STOP CHECK
   // ---------------------------------------------
+
   async function waitIfPaused() {
     while (getIsPaused()) {
       if (getStopSorting()) {
@@ -38,23 +39,29 @@ export async function insertionSort(
       await sleep(50);
     }
 
-    return !getStopSorting();
+    if (getStopSorting()) {
+      return false;
+    }
+
+    return true;
   }
 
   // ---------------------------------------------
   // CLEANUP
   // ---------------------------------------------
+
   function cleanup() {
+    setCurrentLine(0);
     setActiveBars([]);
     setSwappingBars([]);
     setMinBar(-1);
-    setCurrentLine(0);
     setIsSorting(false);
   }
 
   // ---------------------------------------------
   // START
   // ---------------------------------------------
+
   setIsSorting(true);
   setSortingFinished(false);
 
@@ -65,21 +72,21 @@ export async function insertionSort(
 
   setActiveBars([]);
   setSwappingBars([]);
-  setMinBar(-1);
   setSortedBars([]);
+  setMinBar(-1);
 
   // ---------------------------------------------
   // INSERTION SORT
   // ---------------------------------------------
-  for (let i = 1; i < arr.length; i++) {
 
-    // Stop
+  for (let i = 1; i < arr.length; i++) {
+    // Stop check
     if (getStopSorting()) {
       cleanup();
       return;
     }
 
-    // Pause
+    // Pause check
     if (!(await waitIfPaused())) {
       cleanup();
       return;
@@ -88,24 +95,22 @@ export async function insertionSort(
     setCurrentLine(1);
 
     // Current element being inserted
-    const key = arr[i];
+    let j = i;
 
     setMinBar(i);
 
-    await sleep(speed * 0.5);
-
-    let j = i - 1;
-
     // -------------------------------------------
-    // FIND CORRECT POSITION
+    // Move current element left using swaps
     // -------------------------------------------
-    while (j >= 0) {
 
+    while (j > 0) {
+      // Stop check
       if (getStopSorting()) {
         cleanup();
         return;
       }
 
+      // Pause check
       if (!(await waitIfPaused())) {
         cleanup();
         return;
@@ -113,33 +118,43 @@ export async function insertionSort(
 
       setCurrentLine(2);
 
-      // Highlight comparison
-      setActiveBars([j, j + 1]);
+      // Highlight elements being compared
+      setActiveBars([j - 1, j]);
 
       comparisons++;
       setComparisons(comparisons);
 
       await sleep(speed);
 
-      // Correct position found
-      if (arr[j].value <= key.value) {
+      // -----------------------------------------
+      // Already in correct position
+      // -----------------------------------------
+
+      if (arr[j - 1].value <= arr[j].value) {
         break;
       }
 
       // -----------------------------------------
-      // SHIFT ELEMENT TO RIGHT
+      // SWAP
       // -----------------------------------------
+
       setCurrentLine(3);
 
-      setSwappingBars([j, j + 1]);
+      setSwappingBars([j - 1, j]);
 
-      await sleep(speed * 0.5);
+      await sleep(speed / 2);
 
-      arr[j + 1] = arr[j];
+      // Adjacent swap
+      [arr[j - 1], arr[j]] = [
+        arr[j],
+        arr[j - 1],
+      ];
 
-      shifts++;
-      setSwaps(shifts);
+      swaps++;
+      setSwaps(swaps);
 
+      // IMPORTANT:
+      // Every object keeps its own unique ID.
       setArray([...arr]);
 
       await sleep(speed);
@@ -150,35 +165,42 @@ export async function insertionSort(
     }
 
     // -------------------------------------------
-    // INSERT KEY
+    // Current pass completed
     // -------------------------------------------
-    arr[j + 1] = key;
-
-    setArray([...arr]);
 
     setCurrentLine(4);
 
-    setActiveBars([]);
-    setSwappingBars([]);
-    setMinBar(-1);
+    setArray([...arr]);
 
-    // Everything from 0 → i is sorted
     setSortedBars(
-      Array.from({ length: i + 1 }, (_, index) => index)
+      Array.from(
+        { length: i + 1 },
+        (_, index) => index
+      )
     );
 
     setProgress(
       Math.round(((i + 1) / arr.length) * 100)
     );
 
-    await sleep(speed * 0.5);
+    setActiveBars([]);
+    setSwappingBars([]);
+    setMinBar(-1);
+
+    await sleep(speed / 2);
   }
 
   // ---------------------------------------------
-  // SORTING COMPLETE
+  // FINISHED
   // ---------------------------------------------
+
+  setArray([...arr]);
+
   setSortedBars(
-    Array.from({ length: arr.length }, (_, index) => index)
+    Array.from(
+      { length: arr.length },
+      (_, index) => index
+    )
   );
 
   setProgress(100);
@@ -188,6 +210,7 @@ export async function insertionSort(
   );
 
   setCurrentLine(0);
+
   setActiveBars([]);
   setSwappingBars([]);
   setMinBar(-1);

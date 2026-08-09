@@ -1,4 +1,5 @@
 import ComplexityCard from "./ComplexityCard";
+import StatCard from "./StatCard";
 
 function Sidebar({
   selectedAlgorithm,
@@ -9,84 +10,238 @@ function Sidebar({
   totalBars,
   progress,
 }) {
-  const isMergeSort = selectedAlgorithm === "merge";
+  const safeProgress = Math.min(100, Math.max(0, progress || 0));
 
   return (
     <div className="space-y-4">
 
-      {/* Complexity */}
+      {/* ============================================
+          COMPLEXITY
+      ============================================ */}
+
       <ComplexityCard algorithm={selectedAlgorithm} />
 
-      {/* Statistics */}
-      <div className="bg-[#102235] border border-slate-700 rounded-2xl p-5 shadow-xl">
+      {/* ============================================
+          STATISTICS
+      ============================================ */}
 
-        <h2 className="text-xl font-bold text-cyan-300 mb-4">
+      <div className="bg-slate-900/80 border border-slate-700 rounded-2xl p-4">
+
+        <h3 className="text-lg font-bold text-white mb-4">
           Statistics
-        </h2>
+        </h3>
 
         <div className="grid grid-cols-2 gap-3">
 
           {/* Comparisons */}
-          <div className="bg-slate-800 rounded-xl p-4 text-center transition-all duration-300 hover:bg-slate-700">
-            <p className="text-slate-400 text-sm">
-              Comparisons
-            </p>
-
-            <p className="text-3xl font-bold text-cyan-300 mt-2 tabular-nums">
-              {comparisons}
-            </p>
-          </div>
+          <StatCard
+            title="Comparisons"
+            value={comparisons}
+            color="cyan"
+          />
 
           {/* Swaps / Writes */}
-          <div className="bg-slate-800 rounded-xl p-4 text-center transition-all duration-300 hover:bg-slate-700">
-            <p className="text-slate-400 text-sm">
-              {isMergeSort ? "Writes" : "Swaps"}
-            </p>
-
-            <p className="text-3xl font-bold text-orange-400 mt-2 tabular-nums">
-              {swaps}
-            </p>
-          </div>
+          <StatCard
+            title={
+              selectedAlgorithm === "merge"
+                ? "Writes"
+                : "Swaps"
+            }
+            value={swaps}
+            color="orange"
+          />
 
           {/* Time */}
-          <div className="bg-slate-800 rounded-xl p-4 text-center transition-all duration-300 hover:bg-slate-700">
-            <p className="text-slate-400 text-sm">
-              Time
-            </p>
-
-            <p className="text-3xl font-bold text-green-400 mt-2 tabular-nums">
-              {elapsedTime}
-              <span className="text-sm ml-1 text-green-300">
-                ms
+          <StatCard
+            title="Time"
+            value={
+              <span>
+                {elapsedTime}
+                <span className="text-sm ml-1 text-green-300">
+                  ms
+                </span>
               </span>
-            </p>
+            }
+            color="green"
+          />
+
+          {/* Sorted */}
+          <StatCard
+            title="Sorted"
+            value={
+              <span>
+                {sortedCount}
+                <span className="text-lg text-slate-500">
+                  /{totalBars}
+                </span>
+              </span>
+            }
+            color="purple"
+          />
+
+        </div>
+      </div>
+
+      {/* ============================================
+          COLOUR INDICATOR
+      ============================================ */}
+
+      <div className="bg-slate-900/80 border border-slate-700 rounded-2xl p-4">
+
+        <h3 className="text-lg font-bold text-white mb-4">
+          Colour Indicator
+        </h3>
+
+        <div className="space-y-3">
+
+          {/* Normal */}
+          <div className="flex items-center gap-3">
+
+            <div
+              className="
+                w-5
+                h-5
+                rounded
+                bg-gradient-to-t
+                from-cyan-700
+                to-cyan-300
+                shadow-[0_0_8px_rgba(34,211,238,0.35)]
+              "
+            />
+
+            <div>
+              <p className="text-sm font-medium text-slate-200">
+                Normal
+              </p>
+              <p className="text-xs text-slate-500">
+                Unprocessed element
+              </p>
+            </div>
+
           </div>
 
-          {/* Sorted / Processed */}
-          <div className="bg-slate-800 rounded-xl p-4 text-center transition-all duration-300 hover:bg-slate-700">
-            <p className="text-slate-400 text-sm">
-              {isMergeSort ? "Processed" : "Sorted"}
-            </p>
+          {/* Comparing */}
+          <div className="flex items-center gap-3">
 
-            <p className="text-3xl font-bold text-purple-400 mt-2 tabular-nums">
-              {sortedCount}
-              <span className="text-lg text-slate-500">
-                /{totalBars}
-              </span>
-            </p>
+            <div
+              className="
+                w-5
+                h-5
+                rounded
+                bg-gradient-to-t
+                from-red-700
+                to-red-400
+                shadow-[0_0_10px_rgba(239,68,68,0.55)]
+              "
+            />
+
+            <div>
+              <p className="text-sm font-medium text-slate-200">
+                Comparing
+              </p>
+              <p className="text-xs text-slate-500">
+                Elements currently being compared
+              </p>
+            </div>
+
+          </div>
+
+          {/* Swapping */}
+          <div className="flex items-center gap-3">
+
+            <div
+              className="
+                w-5
+                h-5
+                rounded
+                bg-gradient-to-t
+                from-orange-700
+                to-orange-400
+                border
+                border-orange-300
+                shadow-[0_0_10px_rgba(251,146,60,0.65)]
+              "
+            />
+
+            <div>
+              <p className="text-sm font-medium text-slate-200">
+                Swapping / Writing
+              </p>
+              <p className="text-xs text-slate-500">
+                Elements currently being moved
+              </p>
+            </div>
+
+          </div>
+
+          {/* Minimum */}
+          <div className="flex items-center gap-3">
+
+            <div
+              className="
+                w-5
+                h-5
+                rounded
+                bg-gradient-to-t
+                from-purple-700
+                to-purple-400
+                border
+                border-purple-300
+                shadow-[0_0_10px_rgba(168,85,247,0.55)]
+              "
+            />
+
+            <div>
+              <p className="text-sm font-medium text-slate-200">
+                Minimum / Key
+              </p>
+              <p className="text-xs text-slate-500">
+                Current minimum or insertion key
+              </p>
+            </div>
+
+          </div>
+
+          {/* Sorted */}
+          <div className="flex items-center gap-3">
+
+            <div
+              className="
+                w-5
+                h-5
+                rounded
+                bg-gradient-to-t
+                from-green-700
+                to-green-400
+                shadow-[0_0_10px_rgba(34,197,94,0.55)]
+              "
+            />
+
+            <div>
+              <p className="text-sm font-medium text-slate-200">
+                Sorted
+              </p>
+              <p className="text-xs text-slate-500">
+                Element in its final position
+              </p>
+            </div>
+
           </div>
 
         </div>
-
       </div>
 
-      {/* Progress */}
-      <div className="bg-[#102235] border border-slate-700 rounded-2xl p-5 shadow-xl">
+      {/* ============================================
+          PROGRESS
+      ============================================ */}
 
-        <div className="flex justify-between items-center mb-3">
+      <div className="bg-slate-900/80 border border-slate-700 rounded-2xl p-4">
+
+        {/* Header */}
+        <div className="flex items-center justify-between mb-2">
 
           <div>
-            <p className="text-cyan-300 font-semibold">
+            <p className="text-white font-semibold">
               Progress
             </p>
 
@@ -96,31 +251,45 @@ function Sidebar({
           </div>
 
           <span className="text-cyan-300 font-bold tabular-nums">
-            {progress}%
+            {safeProgress}%
           </span>
 
         </div>
 
         {/* Progress Track */}
-        <div className="relative w-full h-3 rounded-full bg-slate-700 overflow-hidden">
+        <div className="relative h-3 bg-slate-700 rounded-full overflow-hidden">
 
           {/* Progress Fill */}
           <div
-            className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-cyan-300 transition-all duration-300 ease-out"
+            className="
+              h-full
+              rounded-full
+              bg-gradient-to-r
+              from-cyan-500
+              to-cyan-300
+              transition-all
+              duration-300
+              ease-out
+            "
             style={{
-              width: `${Math.min(
-                100,
-                Math.max(0, progress)
-              )}%`,
+              width: `${safeProgress}%`,
             }}
           />
 
           {/* Shine */}
-          {progress > 0 && progress < 100 && (
+          {safeProgress > 0 && safeProgress < 100 && (
             <div
-              className="absolute top-0 h-full w-8 bg-white/20 blur-sm animate-pulse"
+              className="
+                absolute
+                top-0
+                h-full
+                w-8
+                bg-white/20
+                blur-sm
+                animate-pulse
+              "
               style={{
-                left: `calc(${progress}% - 16px)`,
+                left: `calc(${safeProgress}% - 16px)`,
               }}
             />
           )}
@@ -128,58 +297,19 @@ function Sidebar({
         </div>
 
         {/* Progress Status */}
-        <div className="flex justify-between mt-2 text-xs">
+        <div className="flex justify-between items-center mt-2 text-xs">
 
           <span className="text-slate-500">
-            {progress === 0
+            {safeProgress === 0
               ? "Waiting to start"
-              : progress === 100
+              : safeProgress === 100
               ? "Complete"
               : "Sorting in progress..."}
           </span>
 
           <span className="text-slate-500">
-            {sortedCount}/{totalBars}{" "}
-            {isMergeSort ? "processed" : "sorted"}
+            {sortedCount}/{totalBars} sorted
           </span>
-
-        </div>
-
-      </div>
-
-      {/* Legend */}
-      <div className="bg-[#102235] border border-slate-700 rounded-2xl p-4 shadow-xl">
-
-        <h2 className="text-lg font-bold text-cyan-300 mb-3">
-          Legend
-        </h2>
-
-        <div className="grid grid-cols-2 gap-3 text-sm">
-
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded bg-cyan-400"></div>
-            <span>Unsorted</span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded bg-red-500"></div>
-            <span>Comparing</span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded bg-purple-500"></div>
-            <span>Minimum</span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded bg-orange-500"></div>
-            <span>Swapping</span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded bg-green-500"></div>
-            <span>Sorted</span>
-          </div>
 
         </div>
 

@@ -12,7 +12,7 @@ function ArrayBars({
     6,
     Math.min(24, 520 / Math.max(array.length, 1))
   );
-
+console.log("BAR COUNT:", array.length);
   return (
     <div className="relative flex justify-center items-end h-[420px] gap-[3px] px-6 border-b-2 border-slate-700 overflow-hidden">
 
@@ -88,7 +88,7 @@ function ArrayBars({
 
         return (
           <motion.div
-            key={bar.id}
+  key={`${bar.id}-${index}`}
             initial={false}
 
             animate={{
