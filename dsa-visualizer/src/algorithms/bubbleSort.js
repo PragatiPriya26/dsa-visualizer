@@ -27,16 +27,22 @@ export async function bubbleSort(
     new Promise((resolve) => setTimeout(resolve, ms));
 
   async function waitIfPaused() {
-    while (getIsPaused()) {
-      if (getStopSorting()) {
-        return false;
-      }
-
-      await sleep(100);
+  while (getIsPaused()) {
+    // Immediately exit if reset was clicked
+    if (getStopSorting()) {
+      return false;
     }
 
-    return true;
+    await sleep(50);
   }
+
+  // Also check after pause is released
+  if (getStopSorting()) {
+    return false;
+  }
+
+  return true;
+}
 
   function stopSortingCleanup() {
     setActiveBars([]);

@@ -8,88 +8,158 @@ function ArrayBars({
   minBar,
   swapAnimation,
 }) {
+  const barWidth = Math.max(
+    6,
+    Math.min(24, 520 / Math.max(array.length, 1))
+  );
+
   return (
-    <div className="relative flex justify-center items-end h-[420px] gap-[3px] px-6 border-b-2 border-slate-700">
+    <div className="relative flex justify-center items-end h-[420px] gap-[3px] px-6 border-b-2 border-slate-700 overflow-hidden">
 
       {array.map((bar, index) => {
-        let color = "bg-gradient-to-t from-cyan-700 to-cyan-300";
-        let extraClass = "";
+        let color =
+          "bg-gradient-to-t from-cyan-700 to-cyan-300";
 
+        let shadow = "";
+        let border = "";
+
+        /* =========================
+           SORTED
+        ========================= */
         if (sortedBars.includes(index)) {
-          color = "bg-gradient-to-t from-green-700 to-green-400";
+          color =
+            "bg-gradient-to-t from-green-700 to-green-400";
+
+          shadow =
+            "shadow-[0_0_14px_rgba(34,197,94,0.45)]";
         }
 
+        /* =========================
+           SWAPPING
+        ========================= */
         else if (swappingBars.includes(index)) {
-          color = "bg-gradient-to-t from-orange-700 to-orange-400";
-          extraClass =
-  "scale-110 ring-2 ring-orange-300 shadow-2xl shadow-orange-500/80"
+          color =
+            "bg-gradient-to-t from-orange-700 to-orange-400";
+
+          shadow =
+            "shadow-[0_0_30px_rgba(251,146,60,0.9)]";
+
+          border =
+            "border border-orange-300";
         }
 
+        /* =========================
+           MINIMUM
+        ========================= */
         else if (minBar === index) {
-          color = "bg-gradient-to-t from-purple-700 to-purple-400";
-          extraClass =
-            "scale-110 shadow-xl shadow-purple-500/70 border border-purple-300";
+          color =
+            "bg-gradient-to-t from-purple-700 to-purple-400";
+
+          shadow =
+            "shadow-[0_0_25px_rgba(168,85,247,0.8)]";
+
+          border =
+            "border border-purple-300";
         }
 
+        /* =========================
+           COMPARING
+        ========================= */
         else if (activeBars.includes(index)) {
-          color = "bg-gradient-to-t from-red-700 to-red-400";
-          extraClass =
-            "scale-110 shadow-xl shadow-red-500/70";
+          color =
+            "bg-gradient-to-t from-red-700 to-red-400";
+
+          shadow =
+            "shadow-[0_0_22px_rgba(239,68,68,0.8)]";
         }
-const movingLeft =
-  swapAnimation?.leftId === bar.id;
 
-const movingRight =
-  swapAnimation?.rightId === bar.id;
+        /* =========================
+           SWAP ANIMATION
+        ========================= */
+
+        const movingLeft =
+          swapAnimation?.leftId === bar.id;
+
+        const movingRight =
+          swapAnimation?.rightId === bar.id;
+
+        const isMoving =
+          movingLeft || movingRight;
+
         return (
-         
-  <motion.div
-  key={bar.id}
-  layout
-  layoutId={bar.id}
-  initial={false}
-  animate={{
-    y: movingLeft || movingRight ? -18 : 0,
+          <motion.div
+            key={bar.id}
+            initial={false}
 
-    scale: movingLeft || movingRight
-      ? 1.12
-      : activeBars.includes(index)
-      ? 1.05
-      : 1,
+            animate={{
+              x: movingLeft
+                ? barWidth + 3
+                : movingRight
+                ? -(barWidth + 3)
+                : 0,
 
-    rotate:
-      movingLeft
-        ? -2
-        : movingRight
-        ? 2
-        : 0,
-  }}
-  transition={{
-    layout: {
-      duration: 0.55,
-      type: "spring",
-      stiffness: 170,
-      damping: 20,
-    },
+              y: isMoving ? -8 : 0,
 
-    y: {
-      duration: 0.22,
-    },
+              scale: isMoving ? 1.03 : 1,
 
-    scale: {
-      duration: 0.2,
-    },
+              rotate: movingLeft
+                ? -1.5
+                : movingRight
+                ? 1.5
+                : 0,
+            }}
 
-    rotate: {
-      duration: 0.2,
-    },
-  }}
-  className={`rounded-t-xl ${color} ${extraClass}`}
-  style={{
-    width: `${Math.max(6, 520 / array.length)}px`,
-    height: `${bar.value}px`,
-  }}
-/>
+            transition={{
+              x: {
+                duration: 0.35,
+                ease: [0.22, 1, 0.36, 1],
+              },
+
+              y: {
+                duration: 0.2,
+                ease: "easeOut",
+              },
+
+              scale: {
+                duration: 0.2,
+                ease: "easeOut",
+              },
+
+              rotate: {
+                duration: 0.2,
+                ease: "easeOut",
+              },
+            }}
+
+            className={`
+              relative
+              rounded-t-lg
+              ${color}
+              ${shadow}
+              ${border}
+              will-change-transform
+            `}
+
+            style={{
+              width: `${barWidth}px`,
+              height: `${bar.value}px`,
+            }}
+          >
+
+            {/* Top Highlight */}
+            <div
+              className="
+                absolute
+                inset-x-0
+                top-0
+                h-[2px]
+                rounded-full
+                bg-white/30
+                pointer-events-none
+              "
+            />
+
+          </motion.div>
         );
       })}
 

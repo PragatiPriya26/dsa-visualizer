@@ -27,9 +27,20 @@ export async function selectionSort(
 
   async function waitIfPaused() {
     while (getIsPaused()) {
-      if (getStopSorting()) return;
-      await sleep(100);
+      if (getStopSorting()) return false;
+
+      await sleep(50);
     }
+
+    return !getStopSorting();
+  }
+
+  function cleanup() {
+    setCurrentLine(0);
+    setActiveBars([]);
+    setSwappingBars([]);
+    setMinBar(-1);
+    setIsSorting(false);
   }
 
   setIsSorting(true);
@@ -44,25 +55,21 @@ export async function selectionSort(
   setSwappingBars([]);
   setMinBar(-1);
 
+  /* =========================
+     SELECTION SORT
+  ========================= */
+
   for (let i = 0; i < arr.length; i++) {
 
+    /* Stop */
     if (getStopSorting()) {
-      setCurrentLine(0);
-      setActiveBars([]);
-      setSwappingBars([]);
-      setMinBar(-1);
-      setIsSorting(false);
+      cleanup();
       return;
     }
 
-    await waitIfPaused();
-
-    if (getStopSorting()) {
-      setCurrentLine(0);
-      setActiveBars([]);
-      setSwappingBars([]);
-      setMinBar(-1);
-      setIsSorting(false);
+    /* Pause */
+    if (!(await waitIfPaused())) {
+      cleanup();
       return;
     }
 
@@ -70,99 +77,157 @@ export async function selectionSort(
 
     let minIndex = i;
 
+    /* -------------------------
+       Initial minimum
+    ------------------------- */
+
     setCurrentLine(2);
+
     setMinBar(minIndex);
+
+    // Give the minimum marker time to appear
+    await sleep(speed * 0.5);
+
+    /* -------------------------
+       Find minimum
+    ------------------------- */
 
     for (let j = i + 1; j < arr.length; j++) {
 
       if (getStopSorting()) {
-        setCurrentLine(0);
-        setActiveBars([]);
-        setSwappingBars([]);
-        setMinBar(-1);
-        setIsSorting(false);
+        cleanup();
         return;
       }
 
-      await waitIfPaused();
-
-      if (getStopSorting()) {
-        setCurrentLine(0);
-        setActiveBars([]);
-        setSwappingBars([]);
-        setMinBar(-1);
-        setIsSorting(false);
+      if (!(await waitIfPaused())) {
+        cleanup();
         return;
       }
 
       setCurrentLine(3);
 
+      /* Compare */
       setActiveBars([minIndex, j]);
-
-      await sleep(speed);
 
       comparisons++;
       setComparisons(comparisons);
 
-      setCurrentLine(4);
+      await sleep(speed);
+
+      if (getStopSorting()) {
+        cleanup();
+        return;
+      }
+
+      /* -------------------------
+         New minimum found
+      ------------------------- */
 
       if (arr[j].value < arr[minIndex].value) {
+
         minIndex = j;
 
-        setCurrentLine(5);
+        setCurrentLine(4);
 
+        // Move minimum marker
         setMinBar(minIndex);
+
+        // Small pause so user can see it
+        await sleep(speed * 0.45);
       }
 
       setActiveBars([]);
     }
 
+    /* -------------------------
+       Swap minimum into position
+    ------------------------- */
+
     if (minIndex !== i) {
 
-      await waitIfPaused();
-
-      if (getStopSorting()) {
-        setCurrentLine(0);
-        setActiveBars([]);
-        setSwappingBars([]);
-        setMinBar(-1);
-        setIsSorting(false);
+      if (!(await waitIfPaused())) {
+        cleanup();
         return;
       }
 
-      setCurrentLine(6);
+      if (getStopSorting()) {
+        cleanup();
+        return;
+      }
 
+      setCurrentLine(5);
+
+      /* Highlight the two bars */
       setSwappingBars([i, minIndex]);
 
-      await sleep(speed);
+      // Remove minimum marker during swap
+      setMinBar(-1);
 
-      [arr[i], arr[minIndex]] = [arr[minIndex], arr[i]];
+      await sleep(speed * 0.7);
+
+      if (getStopSorting()) {
+        cleanup();
+        return;
+      }
+
+      /* Actual swap */
+      [arr[i], arr[minIndex]] = [
+        arr[minIndex],
+        arr[i],
+      ];
 
       swaps++;
       setSwaps(swaps);
 
       setArray([...arr]);
 
-      await sleep(speed);
+      /*
+       * Give Framer Motion time
+       * to animate the new positions.
+       */
+      await sleep(Math.max(50, speed * 0.6));
 
       setSwappingBars([]);
+
+      await sleep(speed * 0.25);
+    } else {
+      /* No swap required */
+      setMinBar(-1);
     }
 
-    setMinBar(-1);
+    /* -------------------------
+       Mark position sorted
+    ------------------------- */
 
-    setSortedBars((prev) => [...prev, i]);
+    setSortedBars((prev) => [
+      ...prev,
+      i,
+    ]);
 
     setProgress(
-      Math.round(((i + 1) / arr.length) * 100)
+      Math.round(
+        ((i + 1) / arr.length) * 100
+      )
     );
+
+    await sleep(speed * 0.25);
   }
+
+  /* =========================
+     FINISHED
+  ========================= */
 
   const end = performance.now();
 
-  setElapsedTime(Math.round(end - start));
+  setElapsedTime(
+    Math.round(end - start)
+  );
 
   setSortedBars(
-    Array.from({ length: arr.length }, (_, i) => i)
+    Array.from(
+      { length: arr.length },
+      (_, i) => i
+    )
   );
 
   setCurrentLine(0);

@@ -1,3 +1,5 @@
+
+
 export async function mergeSort(
   array,
   setArray,
@@ -27,13 +29,37 @@ export async function mergeSort(
 
   async function waitIfPaused() {
     while (getIsPaused()) {
-      if (getStopSorting()) return false;
-      await sleep(100);
+      if (getStopSorting()) {
+        return false;
+      }
+
+      await sleep(50);
     }
-    return !getStopSorting();
+
+    if (getStopSorting()) {
+      return false;
+    }
+
+    return true;
+  }
+
+  function cleanup() {
+    setActiveBars([]);
+    setSwappingBars([]);
+    setSortedBars([]);
+    setCurrentLine(0);
+    setProgress(0);
+    setSortingFinished(false);
+    setIsSorting(false);
   }
 
   async function merge(left, mid, right) {
+    if (getStopSorting()) return false;
+
+    if (!(await waitIfPaused())) {
+      return false;
+    }
+
     const leftArr = arr.slice(left, mid + 1);
     const rightArr = arr.slice(mid + 1, right + 1);
 
@@ -42,25 +68,36 @@ export async function mergeSort(
     let k = left;
 
     while (i < leftArr.length && j < rightArr.length) {
+      if (getStopSorting()) return false;
 
-      if (getStopSorting()) return;
-
-      if (!(await waitIfPaused())) return;
+      if (!(await waitIfPaused())) {
+        return false;
+      }
 
       setCurrentLine(5);
 
-      setActiveBars([left + i, mid + 1 + j]);
+      setActiveBars([
+        left + i,
+        mid + 1 + j,
+      ]);
 
       comparisons++;
       setComparisons(comparisons);
 
       await sleep(speed);
-setCurrentLine(6);
+
+      if (getStopSorting()) return false;
+
+      setCurrentLine(6);
+
       if (leftArr[i].value <= rightArr[j].value) {
         setCurrentLine(7);
+
         arr[k] = leftArr[i];
         i++;
       } else {
+        setCurrentLine(7);
+
         arr[k] = rightArr[j];
         j++;
       }
@@ -74,39 +111,78 @@ setCurrentLine(6);
 
       await sleep(speed);
 
+      if (getStopSorting()) return false;
+
       setSwappingBars([]);
 
       k++;
     }
-setCurrentLine(8);
-    while (i < leftArr.length) {
-      if (getStopSorting()) return;
 
-      arr[k++] = leftArr[i++];
+    setCurrentLine(8);
+
+    while (i < leftArr.length) {
+      if (getStopSorting()) return false;
+
+      if (!(await waitIfPaused())) {
+        return false;
+      }
+
+      arr[k] = leftArr[i];
+
+      i++;
+      k++;
+
       writes++;
       setSwaps(writes);
+
       setArray([...arr]);
+
+      setSwappingBars([k - 1]);
+
       await sleep(speed);
+
+      setSwappingBars([]);
     }
 
     while (j < rightArr.length) {
-      if (getStopSorting()) return;
+      if (getStopSorting()) return false;
 
-      arr[k++] = rightArr[j++];
+      if (!(await waitIfPaused())) {
+        return false;
+      }
+
+      arr[k] = rightArr[j];
+
+      j++;
+      k++;
+
       writes++;
       setSwaps(writes);
+
       setArray([...arr]);
+
+      setSwappingBars([k - 1]);
+
       await sleep(speed);
+
+      setSwappingBars([]);
     }
+
+    return true;
   }
 
   async function sort(left, right) {
+    if (getStopSorting()) {
+      return false;
+    }
 
-    if (getStopSorting()) return;
+    if (!(await waitIfPaused())) {
+      return false;
+    }
 
-    if (!(await waitIfPaused())) return;
-
-    if (left >= right) return;
+    if (left >= right) {
+      return true;
+    }
 
     setCurrentLine(1);
 
@@ -114,21 +190,53 @@ setCurrentLine(8);
 
     setCurrentLine(2);
 
-    await sort(left, mid);
+    // Sort left half
+    const leftFinished = await sort(left, mid);
+
+    if (!leftFinished) {
+      return false;
+    }
+
+    if (getStopSorting()) {
+      return false;
+    }
+
     setCurrentLine(3);
 
-    await sort(mid + 1, right);
+    // Sort right half
+    const rightFinished = await sort(mid + 1, right);
+
+    if (!rightFinished) {
+      return false;
+    }
+
+    if (getStopSorting()) {
+      return false;
+    }
 
     setCurrentLine(4);
 
-    await merge(left, mid, right);
+    // Merge
+    const merged = await merge(left, mid, right);
+
+    if (!merged) {
+      return false;
+    }
+
+    if (getStopSorting()) {
+      return false;
+    }
+
     setCurrentLine(5);
 
     setProgress(
       Math.round(((right + 1) / arr.length) * 100)
     );
+
+    return true;
   }
 
+  // Start
   setIsSorting(true);
   setSortingFinished(false);
 
@@ -141,25 +249,37 @@ setCurrentLine(8);
   setSwappingBars([]);
   setSortedBars([]);
 
-  await sort(0, arr.length - 1);
+  const completed = await sort(
+    0,
+    arr.length - 1
+  );
 
-  if (!getStopSorting()) {
-    setSortedBars(
-      Array.from({ length: arr.length }, (_, i) => i)
-    );
-
-    setProgress(100);
-
-    setElapsedTime(
-      Math.round(performance.now() - start)
-    );
-
-    setSortingFinished(true);
+  // Reset/Stop happened
+  if (!completed || getStopSorting()) {
+    cleanup();
+    return;
   }
+
+  // Sorting successfully completed
+  setArray([...arr]);
+
+  setSortedBars(
+    Array.from(
+      { length: arr.length },
+      (_, i) => i
+    )
+  );
+
+  setProgress(100);
+
+  setElapsedTime(
+    Math.round(performance.now() - start)
+  );
 
   setCurrentLine(0);
   setActiveBars([]);
   setSwappingBars([]);
 
+  setSortingFinished(true);
   setIsSorting(false);
 }
