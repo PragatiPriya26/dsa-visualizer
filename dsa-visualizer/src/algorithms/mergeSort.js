@@ -23,6 +23,10 @@ export async function mergeSort(
 
   const start = performance.now();
 
+  // ==================================================
+  // SLEEP
+  // ==================================================
+
   const sleep = (ms) =>
     new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -54,9 +58,11 @@ export async function mergeSort(
     setActiveBars([]);
     setSwappingBars([]);
     setSortedBars([]);
+    setMergeRange(null);
+
     setCurrentLine(0);
     setProgress(0);
-    setMergeRange(null);
+
     setSortingFinished(false);
     setIsSorting(false);
   }
@@ -74,6 +80,21 @@ export async function mergeSort(
       return false;
     }
 
+    // ==================================================
+    // 🟣 ONLY THIS RANGE IS PURPLE
+    //
+    // Example:
+    //
+    // [2, 5, 8] [1, 4, 9]
+    //  ^^^^^^^^^^^^^^^^^
+    //  currently merging
+    // ==================================================
+
+    setMergeRange({
+      left,
+      right,
+    });
+
     const leftPart = arr.slice(left, mid + 1);
     const rightPart = arr.slice(mid + 1, right + 1);
 
@@ -81,14 +102,8 @@ export async function mergeSort(
     let j = 0;
     let k = left;
 
-    // Show the current section being merged
-    setMergeRange({
-      start: left,
-      end: right,
-    });
-
     // ==================================================
-    // COMPARE BOTH HALVES
+    // MERGE TWO SORTED HALVES
     // ==================================================
 
     while (
@@ -106,7 +121,10 @@ export async function mergeSort(
       const leftIndex = left + i;
       const rightIndex = mid + 1 + j;
 
-      // 🔴 Comparing
+      // ==================================================
+      // 🔴 COMPARISON
+      // ==================================================
+
       setCurrentLine(5);
 
       setActiveBars([
@@ -126,7 +144,7 @@ export async function mergeSort(
       }
 
       // ==================================================
-      // CHOOSE SMALLER
+      // CHOOSE SMALLER ELEMENT
       // ==================================================
 
       let selected;
@@ -143,14 +161,13 @@ export async function mergeSort(
       }
 
       // ==================================================
-      // WRITE
+      // 🟠 WRITE TO ARRAY
       // ==================================================
 
       setCurrentLine(6);
 
       setActiveBars([]);
 
-      // 🟠 Position being written
       setSwappingBars([k]);
 
       arr[k] = selected;
@@ -162,22 +179,27 @@ export async function mergeSort(
 
       await sleep(speed);
 
+      if (getStopSorting()) {
+        return false;
+      }
+
       setSwappingBars([]);
 
       k++;
 
+      // ==================================================
+      // PROGRESS
+      // ==================================================
+
       setProgress(
-        Math.min(
-          99,
-          Math.round(
-            (k / arr.length) * 100
-          )
+        Math.round(
+          (k / arr.length) * 100
         )
       );
     }
 
     // ==================================================
-    // REMAINING LEFT
+    // REMAINING LEFT ELEMENTS
     // ==================================================
 
     while (i < leftPart.length) {
@@ -207,11 +229,21 @@ export async function mergeSort(
 
       await sleep(speed);
 
+      if (getStopSorting()) {
+        return false;
+      }
+
       setSwappingBars([]);
+
+      setProgress(
+        Math.round(
+          (k / arr.length) * 100
+        )
+      );
     }
 
     // ==================================================
-    // REMAINING RIGHT
+    // REMAINING RIGHT ELEMENTS
     // ==================================================
 
     while (j < rightPart.length) {
@@ -241,19 +273,33 @@ export async function mergeSort(
 
       await sleep(speed);
 
+      if (getStopSorting()) {
+        return false;
+      }
+
       setSwappingBars([]);
+
+      setProgress(
+        Math.round(
+          (k / arr.length) * 100
+        )
+      );
     }
 
     // ==================================================
-    // SECTION MERGED
+    // MERGE FINISHED
     // ==================================================
 
     setActiveBars([]);
-
     setSwappingBars([]);
 
-    // Keep merged section highlighted briefly
-    await sleep(Math.max(100, speed / 2));
+    // Keep the merged section violet briefly
+    await sleep(
+      Math.max(80, speed * 0.5)
+    );
+
+    // Remove purple
+    setMergeRange(null);
 
     return true;
   }
@@ -286,56 +332,63 @@ export async function mergeSort(
       (left + right) / 2
     );
 
-    setMergeRange({
-      start: left,
-      end: right,
-    });
-
-    await sleep(Math.max(100, speed / 2));
-
     // ==================================================
-    // LEFT HALF
+    // SORT LEFT HALF
     // ==================================================
 
     setCurrentLine(2);
 
-    const leftDone = await sort(
-      left,
-      mid
-    );
+    const leftDone =
+      await sort(left, mid);
 
     if (!leftDone) {
       return false;
     }
 
+    if (getStopSorting()) {
+      return false;
+    }
+
     // ==================================================
-    // RIGHT HALF
+    // SORT RIGHT HALF
     // ==================================================
 
     setCurrentLine(3);
 
-    const rightDone = await sort(
-      mid + 1,
-      right
-    );
+    const rightDone =
+      await sort(mid + 1, right);
 
     if (!rightDone) {
       return false;
     }
 
+    if (getStopSorting()) {
+      return false;
+    }
+
     // ==================================================
     // MERGE
+    //
+    // IMPORTANT:
+    // Purple is NOT set here.
+    //
+    // merge() itself sets the exact range.
     // ==================================================
 
     setCurrentLine(4);
 
-    const merged = await merge(
-      left,
-      mid,
-      right
-    );
+    const merged =
+      await merge(
+        left,
+        mid,
+        right
+      );
 
     if (!merged) {
+      return false;
+    }
+
+    if (getStopSorting()) {
       return false;
     }
 
@@ -360,16 +413,17 @@ export async function mergeSort(
   setMergeRange(null);
 
   // ==================================================
-  // RUN MERGE SORT
+  // RUN
   // ==================================================
 
-  const completed = await sort(
-    0,
-    arr.length - 1
-  );
+  const completed =
+    await sort(
+      0,
+      arr.length - 1
+    );
 
   // ==================================================
-  // STOPPED
+  // STOPPED / RESET
   // ==================================================
 
   if (
@@ -381,16 +435,21 @@ export async function mergeSort(
   }
 
   // ==================================================
-  // FINAL RESULT
+  // COMPLETED
   // ==================================================
 
   setArray([...arr]);
 
   setActiveBars([]);
   setSwappingBars([]);
+
+  // Remove purple
   setMergeRange(null);
 
-  // 🟢 Everything is finally sorted
+  // ==================================================
+  // 🟢 EVERYTHING SORTED
+  // ==================================================
+
   setSortedBars(
     Array.from(
       { length: arr.length },

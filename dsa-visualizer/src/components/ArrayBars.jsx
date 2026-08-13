@@ -2,80 +2,147 @@ import { motion } from "framer-motion";
 
 function ArrayBars({
   array,
-  activeBars,
-  swappingBars,
-  sortedBars,
-  minBar,
+  activeBars = [],
+  swappingBars = [],
+  sortedBars = [],
+  minBar = -1,
+  selectedAlgorithm,
   swapAnimation,
+  mergeRange,
 }) {
   const barWidth = Math.max(
     6,
     Math.min(24, 520 / Math.max(array.length, 1))
   );
-console.log("BAR COUNT:", array.length);
-  return (
-    <div className="relative flex justify-center items-end h-[420px] gap-[3px] px-6 border-b-2 border-slate-700 overflow-hidden">
 
+  return (
+    <div className="flex items-end justify-center gap-[2px] h-[380px]">
       {array.map((bar, index) => {
-        let color =
+        // ==================================================
+        // STATES
+        // ==================================================
+
+        const isSorted = sortedBars.includes(index);
+        const isComparing = activeBars.includes(index);
+        const isMoving = swappingBars.includes(index);
+
+        const isMinimum =
+          minBar === index &&
+          (selectedAlgorithm === "selection" ||
+            selectedAlgorithm === "insertion");
+
+        const isMergeRange =
+          selectedAlgorithm === "merge" &&
+          mergeRange &&
+          index >= mergeRange.left &&
+          index <= mergeRange.right;
+
+        // ==================================================
+        // DEFAULT = CYAN
+        // ==================================================
+
+        let barClass =
           "bg-gradient-to-t from-cyan-700 to-cyan-300";
 
-        let shadow = "";
-        let border = "";
+        let barShadow = "";
+        let barBorder = "";
 
-        /* =========================
-           SORTED
-        ========================= */
-        if (sortedBars.includes(index)) {
-          color =
-            "bg-gradient-to-t from-green-700 to-green-400";
+        // ==================================================
+        // PRIORITY ORDER
+        //
+        // GREEN  = sorted
+        // VIOLET = minimum/current
+        // ORANGE = moving
+        // RED    = comparing
+        // VIOLET = merge range
+        // CYAN   = normal
+        // ==================================================
 
-          shadow =
-            "shadow-[0_0_14px_rgba(34,197,94,0.45)]";
+        // ==================================================
+        // 🟣 MERGE RANGE
+        // ==================================================
+
+        if (isMergeRange) {
+          barClass =
+            "bg-gradient-to-t from-violet-950 via-violet-700 to-violet-400";
+
+          barShadow =
+            "shadow-[0_0_22px_rgba(139,92,246,0.9)]";
+
+          barBorder =
+            "border-2 border-violet-300";
         }
 
-        /* =========================
-           SWAPPING
-        ========================= */
-        else if (swappingBars.includes(index)) {
-          color =
-            "bg-gradient-to-t from-orange-700 to-orange-400";
+        // ==================================================
+        // 🔴 COMPARING
+        // ==================================================
 
-          shadow =
-            "shadow-[0_0_30px_rgba(251,146,60,0.9)]";
+        if (isComparing) {
+          barClass =
+            "bg-gradient-to-t from-red-900 via-red-700 to-red-400";
 
-          border =
-            "border border-orange-300";
+          barShadow =
+            "shadow-[0_0_28px_rgba(239,68,68,0.95)]";
+
+          barBorder =
+            "border-2 border-red-200";
         }
 
-        /* =========================
-           MINIMUM
-        ========================= */
-        else if (minBar === index) {
-          color =
-            "bg-gradient-to-t from-purple-700 to-purple-400";
+        // ==================================================
+        // 🟠 MOVING
+        // ==================================================
 
-          shadow =
-            "shadow-[0_0_25px_rgba(168,85,247,0.8)]";
+        if (isMoving) {
+          barClass =
+            "bg-gradient-to-t from-orange-900 via-orange-600 to-orange-300";
 
-          border =
-            "border border-purple-300";
+          barShadow =
+            "shadow-[0_0_30px_rgba(249,115,22,1)]";
+
+          barBorder =
+            "border-2 border-orange-200";
         }
 
-        /* =========================
-           COMPARING
-        ========================= */
-        else if (activeBars.includes(index)) {
-          color =
-            "bg-gradient-to-t from-red-700 to-red-400";
+        // ==================================================
+        // 🟣 MINIMUM
+        //
+        // IMPORTANT:
+        // This comes AFTER RED + ORANGE.
+        //
+        // Therefore the minimum is ALWAYS VIOLET.
+        // ==================================================
 
-          shadow =
-            "shadow-[0_0_22px_rgba(239,68,68,0.8)]";
+        if (isMinimum) {
+          barClass =
+            "bg-gradient-to-t from-violet-950 via-violet-700 to-violet-400";
+
+          barShadow =
+            "shadow-[0_0_35px_rgba(139,92,246,1)]";
+
+          barBorder =
+            "border-2 border-violet-200";
         }
 
-        /* =========================
-           SWAP ANIMATION
-        ========================= */
+        // ==================================================
+        // 🟢 SORTED
+        //
+        // Sorted is final state, so it has highest priority.
+        // ==================================================
+
+        if (isSorted) {
+          barClass =
+            "bg-gradient-to-t from-green-900 via-green-600 to-green-400";
+
+          barShadow =
+            "shadow-[0_0_20px_rgba(34,197,94,0.85)]";
+
+          barBorder =
+            "border-2 border-green-200";
+        }
+
+        // ==================================================
+        // SWAP ANIMATION
+        // ==================================================
 
         const movingLeft =
           swapAnimation?.leftId === bar.id;
@@ -83,14 +150,17 @@ console.log("BAR COUNT:", array.length);
         const movingRight =
           swapAnimation?.rightId === bar.id;
 
-        const isMoving =
+        const isAnimating =
           movingLeft || movingRight;
+
+        // ==================================================
+        // RENDER
+        // ==================================================
 
         return (
           <motion.div
-  key={`${bar.id}-${index}`}
+            key={bar.id}
             initial={false}
-
             animate={{
               x: movingLeft
                 ? barWidth + 3
@@ -98,9 +168,9 @@ console.log("BAR COUNT:", array.length);
                 ? -(barWidth + 3)
                 : 0,
 
-              y: isMoving ? -8 : 0,
+              y: isAnimating ? -8 : 0,
 
-              scale: isMoving ? 1.03 : 1,
+              scale: isAnimating ? 1.04 : 1,
 
               rotate: movingLeft
                 ? -1.5
@@ -108,7 +178,6 @@ console.log("BAR COUNT:", array.length);
                 ? 1.5
                 : 0,
             }}
-
             transition={{
               x: {
                 duration: 0.35,
@@ -130,23 +199,23 @@ console.log("BAR COUNT:", array.length);
                 ease: "easeOut",
               },
             }}
-
             className={`
               relative
               rounded-t-lg
-              ${color}
-              ${shadow}
-              ${border}
+              ${barClass}
+              ${barShadow}
+              ${barBorder}
               will-change-transform
+              transition-all
+              duration-150
             `}
-
             style={{
               width: `${barWidth}px`,
               height: `${bar.value}px`,
             }}
           >
+            {/* TOP HIGHLIGHT */}
 
-            {/* Top Highlight */}
             <div
               className="
                 absolute
@@ -154,15 +223,13 @@ console.log("BAR COUNT:", array.length);
                 top-0
                 h-[2px]
                 rounded-full
-                bg-white/30
+                bg-white/50
                 pointer-events-none
               "
             />
-
           </motion.div>
         );
       })}
-
     </div>
   );
 }

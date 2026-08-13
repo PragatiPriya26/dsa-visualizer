@@ -11,6 +11,7 @@ function SortingVisualizer({
   isPaused,
   sortingFinished,
   swapAnimation,
+  mergeRange, // ✅ ADD THIS
 }) {
   let statusText = "Ready";
   let statusColor = "green";
@@ -27,82 +28,106 @@ function SortingVisualizer({
   }
 
   return (
-    <div className="mt-4">
-      <div className="bg-[#102235] border border-slate-700 rounded-2xl shadow-2xl overflow-hidden">
+    <div className="rounded-2xl border border-slate-700 bg-slate-900/80 overflow-hidden">
 
-        {/* Header */}
-        <div className="flex justify-between items-center px-6 py-4 border-b border-slate-700">
+      {/* ==================================================
+          HEADER
+      ================================================== */}
 
-          <div>
-            <h2 className="text-2xl font-bold text-cyan-300">
-              Sorting Visualizer
-            </h2>
+      <div className="flex justify-between items-center px-6 py-4 border-b border-slate-700">
 
-            <p className="text-slate-400 text-sm mt-1">
-              {selectedAlgorithm.charAt(0).toUpperCase() +
-                selectedAlgorithm.slice(1)}{" "}
-              Sort • Interactive Visualization
-            </p>
-          </div>
+        <div>
+          <h2 className="text-2xl font-bold text-cyan-300">
+            Sorting Visualizer
+          </h2>
 
-          <div className="flex items-center gap-4">
+          <p className="text-slate-400 text-sm mt-1">
+            {selectedAlgorithm.charAt(0).toUpperCase() +
+              selectedAlgorithm.slice(1)}{" "}
+            Sort • Interactive Visualization
+          </p>
+        </div>
 
-            {/* Status */}
-            <div className="flex items-center gap-2 bg-slate-800 px-4 py-2 rounded-xl">
+        <div className="flex items-center gap-4">
 
-              <div
-                className={`w-3 h-3 rounded-full ${
-                  statusColor === "yellow"
-                    ? "bg-yellow-400"
-                    : statusColor === "blue"
-                    ? "bg-blue-400 animate-pulse"
-                    : "bg-green-400"
-                }`}
-              />
+          {/* ==================================================
+              STATUS
+          ================================================== */}
 
-              <span
-                className={`text-sm font-medium ${
-                  statusColor === "yellow"
-                    ? "text-yellow-300"
-                    : statusColor === "blue"
-                    ? "text-blue-300"
-                    : "text-green-300"
-                }`}
-              >
-                {statusText}
-              </span>
+          <div className="flex items-center gap-2 bg-slate-800 px-4 py-2 rounded-xl">
 
-            </div>
+            <div
+              className={`w-3 h-3 rounded-full ${
+                statusColor === "yellow"
+                  ? "bg-yellow-400"
+                  : statusColor === "blue"
+                  ? "bg-blue-400 animate-pulse"
+                  : "bg-green-400"
+              }`}
+            />
 
-            {/* Number of bars */}
-            <div className="bg-slate-800 px-4 py-2 rounded-xl">
-              <span className="text-cyan-300 font-semibold">
-                {array.length} Bars
-              </span>
-            </div>
+            <span
+              className={`text-sm font-medium ${
+                statusColor === "yellow"
+                  ? "text-yellow-300"
+                  : statusColor === "blue"
+                  ? "text-blue-300"
+                  : "text-green-300"
+              }`}
+            >
+              {statusText}
+            </span>
 
           </div>
 
-        </div>
+          {/* ==================================================
+              NUMBER OF BARS
+          ================================================== */}
 
-        {/* Visualization */}
-        <div className="relative p-8 min-h-[470px]">
-
-          {/* Grid */}
-          <div className="absolute inset-0 opacity-5 pointer-events-none bg-[linear-gradient(to_right,#ffffff_1px,transparent_1px),linear-gradient(to_top,#ffffff_1px,transparent_1px)] bg-[size:45px_45px]" />
-
-          <ArrayBars
-            array={array}
-            activeBars={activeBars}
-            swappingBars={swappingBars}
-            sortedBars={sortedBars}
-            minBar={minBar}
-            swapAnimation={swapAnimation}
-          />
+          <div className="bg-slate-800 px-4 py-2 rounded-xl">
+            <span className="text-cyan-300 font-semibold">
+              {array.length} Bars
+            </span>
+          </div>
 
         </div>
+      </div>
+
+      {/* ==================================================
+          VISUALIZATION
+      ================================================== */}
+
+      <div className="relative p-8 min-h-[470px]">
+
+        {/* Grid */}
+
+        <div
+          className="
+            absolute
+            inset-0
+            opacity-5
+            pointer-events-none
+            bg-[linear-gradient(to_right,#ffffff_1px,transparent_1px),linear-gradient(to_top,#ffffff_1px,transparent_1px)]
+            bg-[size:45px_45px]
+          "
+        />
+
+        {/* ==================================================
+            ARRAY BARS
+        ================================================== */}
+
+        <ArrayBars
+          array={array}
+          activeBars={activeBars}
+          swappingBars={swappingBars}
+          sortedBars={sortedBars}
+          minBar={minBar}
+          swapAnimation={swapAnimation}
+          mergeRange={mergeRange} // ✅ NOW PASSED CORRECTLY
+        />
 
       </div>
+
     </div>
   );
 }

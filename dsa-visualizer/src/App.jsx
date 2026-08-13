@@ -284,28 +284,29 @@ function App() {
             break;
 
           // ========================================
-          // SELECTION SORT
-          // ========================================
+// SELECTION SORT
+// ========================================
 
-          case "selection":
-            await selectionSort(
-              array,
-              setArray,
-              speed,
-              setActiveBars,
-              setSwappingBars,
-              setMinBar,
-              setSortedBars,
-              setIsSorting,
-              setComparisons,
-              setSwaps,
-              setElapsedTime,
-              setCurrentLine,
-              setProgress,
-              () => isPausedRef.current,
-              () => stopSortingRef.current
-            );
-            break;
+case "selection":
+  await selectionSort(
+    array,
+    setArray,
+    speed,
+    setActiveBars,
+    setSwappingBars,
+    setMinBar,
+    setSortedBars,
+    setIsSorting,
+    setComparisons,
+    setSwaps,
+    setElapsedTime,
+    setCurrentLine,
+    setProgress,
+    () => isPausedRef.current,
+    () => stopSortingRef.current,
+    setSortingFinished
+  );
+  break;
 
           // ========================================
           // INSERTION SORT
