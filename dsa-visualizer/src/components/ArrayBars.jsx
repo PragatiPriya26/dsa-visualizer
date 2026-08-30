@@ -23,17 +23,17 @@ function ArrayBars({
         // ==================================================
 
         const isSorted = sortedBars.includes(index);
+
         const isComparing = activeBars.includes(index);
+
         const isMoving = swappingBars.includes(index);
 
-        const isMinimum =
-          minBar === index &&
-          (selectedAlgorithm === "selection" ||
-            selectedAlgorithm === "insertion");
+        const isMinimum = minBar === index;
 
         const isMergeRange =
           selectedAlgorithm === "merge" &&
-          mergeRange &&
+          mergeRange !== null &&
+          mergeRange !== undefined &&
           index >= mergeRange.left &&
           index <= mergeRange.right;
 
@@ -48,26 +48,43 @@ function ArrayBars({
         let barBorder = "";
 
         // ==================================================
-        // PRIORITY ORDER
-        //
-        // GREEN  = sorted
-        // VIOLET = minimum/current
-        // ORANGE = moving
-        // RED    = comparing
-        // VIOLET = merge range
-        // CYAN   = normal
+        // 🟢 SORTED
         // ==================================================
+
+        if (
+          isSorted &&
+          !isComparing &&
+          !isMoving &&
+          !isMinimum &&
+          !isMergeRange
+        ) {
+          barClass =
+            "bg-gradient-to-t from-green-900 via-green-600 to-green-400";
+
+          barShadow =
+            "shadow-[0_0_20px_rgba(34,197,94,0.85)]";
+
+          barBorder =
+            "border-2 border-green-200";
+        }
 
         // ==================================================
         // 🟣 MERGE RANGE
+        //
+        // Purple is applied before comparison/writing.
+        // Therefore the entire current merge section
+        // remains visible in purple.
         // ==================================================
 
-        if (isMergeRange) {
+        if (
+          selectedAlgorithm === "merge" &&
+          isMergeRange
+        ) {
           barClass =
             "bg-gradient-to-t from-violet-950 via-violet-700 to-violet-400";
 
           barShadow =
-            "shadow-[0_0_22px_rgba(139,92,246,0.9)]";
+            "shadow-[0_0_30px_rgba(139,92,246,0.95)]";
 
           barBorder =
             "border-2 border-violet-300";
@@ -75,9 +92,15 @@ function ArrayBars({
 
         // ==================================================
         // 🔴 COMPARING
+        //
+        // Only the bars actually being compared become red.
+        // Other bars in mergeRange stay purple.
         // ==================================================
 
-        if (isComparing) {
+        if (
+          isComparing &&
+          !isMoving
+        ) {
           barClass =
             "bg-gradient-to-t from-red-900 via-red-700 to-red-400";
 
@@ -89,7 +112,7 @@ function ArrayBars({
         }
 
         // ==================================================
-        // 🟠 MOVING
+        // 🟠 MOVING / WRITING
         // ==================================================
 
         if (isMoving) {
@@ -104,40 +127,23 @@ function ArrayBars({
         }
 
         // ==================================================
-        // 🟣 MINIMUM
+        // 🟣 MINIMUM / CURRENT ELEMENT
         //
-        // IMPORTANT:
-        // This comes AFTER RED + ORANGE.
-        //
-        // Therefore the minimum is ALWAYS VIOLET.
+        // Used by Selection + Insertion only.
         // ==================================================
 
-        if (isMinimum) {
+        if (
+          isMinimum &&
+          !isMoving
+        ) {
           barClass =
             "bg-gradient-to-t from-violet-950 via-violet-700 to-violet-400";
 
           barShadow =
-            "shadow-[0_0_35px_rgba(139,92,246,1)]";
+            "shadow-[0_0_40px_rgba(139,92,246,1)]";
 
           barBorder =
             "border-2 border-violet-200";
-        }
-
-        // ==================================================
-        // 🟢 SORTED
-        //
-        // Sorted is final state, so it has highest priority.
-        // ==================================================
-
-        if (isSorted) {
-          barClass =
-            "bg-gradient-to-t from-green-900 via-green-600 to-green-400";
-
-          barShadow =
-            "shadow-[0_0_20px_rgba(34,197,94,0.85)]";
-
-          barBorder =
-            "border-2 border-green-200";
         }
 
         // ==================================================

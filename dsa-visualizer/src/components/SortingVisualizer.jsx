@@ -116,15 +116,16 @@ function SortingVisualizer({
             ARRAY BARS
         ================================================== */}
 
-        <ArrayBars
-          array={array}
-          activeBars={activeBars}
-          swappingBars={swappingBars}
-          sortedBars={sortedBars}
-          minBar={minBar}
-          swapAnimation={swapAnimation}
-          mergeRange={mergeRange} // ✅ NOW PASSED CORRECTLY
-        />
+       <ArrayBars
+  array={array}
+  activeBars={activeBars}
+  swappingBars={swappingBars}
+  sortedBars={sortedBars}
+  minBar={minBar}
+  selectedAlgorithm={selectedAlgorithm}
+  swapAnimation={swapAnimation}
+  mergeRange={mergeRange}
+/>
 
       </div>
 

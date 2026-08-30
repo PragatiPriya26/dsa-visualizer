@@ -8,12 +8,12 @@ function TracePanel({
 
   const traces = {
     bubble: [
-      "for (i = 0; i < n - 1; i++)",
+      "for (i = 0; i < n; i++)",
       "  for (j = 0; j < n - i - 1; j++)",
       "    Compare array[j] and array[j + 1]",
       "    If array[j] > array[j + 1]",
       "      Swap the two elements",
-      "    Mark the largest element as sorted",
+      "    Mark largest element as sorted",
     ],
 
     selection: [
@@ -29,9 +29,10 @@ function TracePanel({
     insertion: [
       "for (i = 1; i < n; i++)",
       "  key = array[i]",
-      "  while (j >= 0 && array[j] > key)",
+      "  Compare key with previous elements",
+      "  While array[j] > key",
       "    Shift array[j] to the right",
-      "  Insert key at the correct position",
+      "  Insert key at correct position",
     ],
 
     merge: [
@@ -86,9 +87,18 @@ function TracePanel({
   // ==================================================
 
   const currentStep =
-    currentLine >= 0 && currentLine < code.length
-      ? code[currentLine]
+    currentLine >= 1 && currentLine <= code.length
+      ? code[currentLine - 1]
       : "Ready to start";
+
+  // ==================================================
+  // ACTIVE LINE
+  // ==================================================
+
+  const activeIndex =
+    currentLine >= 1 && currentLine <= code.length
+      ? currentLine - 1
+      : -1;
 
   // ==================================================
   // UI
@@ -118,7 +128,7 @@ function TracePanel({
           <div className="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700">
 
             <span className="text-xs text-slate-400">
-              Current Step
+              Step {currentLine > 0 ? currentLine : "—"}
             </span>
 
           </div>
@@ -134,8 +144,7 @@ function TracePanel({
       <div className="px-5 py-4 border-b border-slate-800">
 
         <p className="text-sm text-slate-400 leading-relaxed">
-          {descriptions[algorithm] ||
-            descriptions.bubble}
+          {descriptions[algorithm] || descriptions.bubble}
         </p>
 
       </div>
@@ -150,8 +159,7 @@ function TracePanel({
 
           {code.map((line, index) => {
 
-            const isActive =
-              currentLine === index + 1;
+            const isActive = index === activeIndex;
 
             return (
               <div
@@ -171,7 +179,7 @@ function TracePanel({
                 `}
               >
 
-                {/* Line Number */}
+                {/* LINE NUMBER */}
 
                 <span
                   className={`
@@ -191,7 +199,7 @@ function TracePanel({
                   {index + 1}
                 </span>
 
-                {/* Code */}
+                {/* CODE */}
 
                 <code
                   className={`
@@ -226,7 +234,7 @@ function TracePanel({
 
           <div className="flex items-start gap-3">
 
-            {/* Indicator */}
+            {/* INDICATOR */}
 
             <div
               className={`

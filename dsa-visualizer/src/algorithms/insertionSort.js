@@ -19,7 +19,7 @@ export async function insertionSort(
   const arr = [...array];
 
   let comparisons = 0;
-  let swaps = 0;
+  let writes = 0;
 
   const start = performance.now();
 
@@ -54,15 +54,13 @@ export async function insertionSort(
   // CLEANUP
   // ==================================================
 
-  function cleanup() {
+  function stopSortingCleanup() {
     setActiveBars([]);
     setSwappingBars([]);
     setMinBar(-1);
     setSortedBars([]);
-
     setCurrentLine(0);
     setProgress(0);
-
     setSortingFinished(false);
     setIsSorting(false);
   }
@@ -72,106 +70,94 @@ export async function insertionSort(
   // ==================================================
 
   setIsSorting(true);
-  setSortingFinished(false);
 
   setComparisons(0);
   setSwaps(0);
   setElapsedTime(0);
   setProgress(0);
+  setSortingFinished(false);
 
   setActiveBars([]);
   setSwappingBars([]);
   setMinBar(-1);
-
-  // ==================================================
-  // IMPORTANT:
-  // First element is already sorted
-  // ==================================================
-
-  if (arr.length > 0) {
-    setSortedBars([0]);
-    setProgress(
-      Math.round((1 / arr.length) * 100)
-    );
-
-    await sleep(Math.max(50, speed * 0.5));
-  }
+  setSortedBars([]);
 
   // ==================================================
   // INSERTION SORT
   // ==================================================
 
   for (let i = 1; i < arr.length; i++) {
-
-    // ==================================================
-    // STOP / PAUSE
-    // ==================================================
+    // --------------------------------------------------
+    // STOP
+    // --------------------------------------------------
 
     if (getStopSorting()) {
-      cleanup();
+      stopSortingCleanup();
       return;
     }
+
+    // --------------------------------------------------
+    // PAUSE
+    // --------------------------------------------------
 
     if (!(await waitIfPaused())) {
-      cleanup();
+      stopSortingCleanup();
       return;
     }
 
-    // ==================================================
-    // CURRENT ELEMENT
-    // 🟣 PURPLE
-    // ==================================================
+    // --------------------------------------------------
+    // CURRENT KEY
+    // --------------------------------------------------
 
-    setCurrentLine(1);
+    const key = arr[i];
+
+    let j = i - 1;
+
+    // 🟣 KEY / CURRENT ELEMENT
+    setMinBar(i);
 
     setActiveBars([]);
     setSwappingBars([]);
 
-    // Current element being inserted
-    setMinBar(i);
+    setCurrentLine(2);
 
     await sleep(speed);
 
-    if (getStopSorting()) {
-      cleanup();
-      return;
-    }
+    // --------------------------------------------------
+    // SEARCH FOR POSITION
+    // --------------------------------------------------
 
-    // ==================================================
-    // INSERT INTO SORTED PART
-    // ==================================================
-
-    let j = i;
-
-    while (j > 0) {
-
-      // ==================================================
-      // STOP / PAUSE
-      // ==================================================
+    while (j >= 0) {
+      // ------------------------------------------------
+      // STOP
+      // ------------------------------------------------
 
       if (getStopSorting()) {
-        cleanup();
+        stopSortingCleanup();
         return;
       }
+
+      // ------------------------------------------------
+      // PAUSE
+      // ------------------------------------------------
 
       if (!(await waitIfPaused())) {
-        cleanup();
+        stopSortingCleanup();
         return;
       }
 
-      // ==================================================
-      // 🔴 COMPARE
-      // ==================================================
+      // ------------------------------------------------
+      // COMPARE
+      // 🔴 CURRENT ELEMENT
+      // 🟣 KEY REMAINS PURPLE
+      // ------------------------------------------------
 
-      setCurrentLine(2);
+      setCurrentLine(3);
 
-      setActiveBars([
-        j - 1,
-        j,
-      ]);
+      setActiveBars([j]);
 
-      // Keep current element purple
-      setMinBar(j);
+      // Keep key purple
+      setMinBar(i);
 
       comparisons++;
       setComparisons(comparisons);
@@ -179,94 +165,138 @@ export async function insertionSort(
       await sleep(speed);
 
       if (getStopSorting()) {
-        cleanup();
+        stopSortingCleanup();
         return;
       }
 
-      // ==================================================
-      // ELEMENT ALREADY IN CORRECT POSITION
-      // ==================================================
+      // ------------------------------------------------
+      // SHIFT REQUIRED
+      // ------------------------------------------------
 
-      if (
-        arr[j - 1].value <=
-        arr[j].value
-      ) {
+      if (arr[j].value > key.value) {
+        // ------------------------------------------------
+        // 🟠 SHIFTING ELEMENT
+        // ------------------------------------------------
+
+        setCurrentLine(4);
+
+        setActiveBars([]);
+
+        setSwappingBars([j, j + 1]);
+
+        await sleep(
+          Math.max(50, speed * 0.6)
+        );
+
+        if (getStopSorting()) {
+          stopSortingCleanup();
+          return;
+        }
+
+        // ------------------------------------------------
+        // SHIFT
+        //
+        // IMPORTANT:
+        // Create a NEW ID.
+        //
+        // This prevents duplicate React keys.
+        // ------------------------------------------------
+
+        arr[j + 1] = {
+          ...arr[j],
+          id: crypto.randomUUID(),
+        };
+
+        writes++;
+        setSwaps(writes);
+
+        setArray([...arr]);
+
+        await sleep(
+          Math.max(50, speed * 0.7)
+        );
+
+        setSwappingBars([]);
+
+        j--;
+
+        // ------------------------------------------------
+        // UPDATE KEY POSITION
+        // ------------------------------------------------
+
+        setMinBar(j + 1);
+
+        // Keep key visually highlighted
+        await sleep(
+          Math.max(30, speed * 0.3)
+        );
+      } else {
         break;
       }
-
-      // ==================================================
-      // 🟠 MOVE / SHIFT
-      // ==================================================
-
-      setCurrentLine(3);
-
-      setActiveBars([]);
-
-      setSwappingBars([
-        j - 1,
-        j,
-      ]);
-
-      await sleep(
-        Math.max(40, speed * 0.5)
-      );
-
-      // ==================================================
-      // SWAP
-      // ==================================================
-
-      [arr[j - 1], arr[j]] = [
-        arr[j],
-        arr[j - 1],
-      ];
-
-      swaps++;
-      setSwaps(swaps);
-
-      setArray([...arr]);
-
-      await sleep(speed);
-
-      if (getStopSorting()) {
-        cleanup();
-        return;
-      }
-
-      setSwappingBars([]);
-
-      j--;
-
-      // Keep the inserted element purple
-      setMinBar(j);
     }
 
-    // ==================================================
-    // CURRENT PREFIX IS NOW SORTED
-    // ==================================================
+    // --------------------------------------------------
+    // INSERT KEY
+    // --------------------------------------------------
 
-    setCurrentLine(4);
+    if (!(await waitIfPaused())) {
+      stopSortingCleanup();
+      return;
+    }
+
+    setCurrentLine(5);
+
+    setActiveBars([]);
+
+    setSwappingBars([]);
+
+    // --------------------------------------------------
+    // IMPORTANT
+    //
+    // Give the key a fresh ID so that React never
+    // receives duplicate IDs after shifting.
+    // --------------------------------------------------
+
+    arr[j + 1] = {
+      ...key,
+      id: crypto.randomUUID(),
+    };
+
+    writes++;
+    setSwaps(writes);
+
+    // Purple key position
+    setMinBar(j + 1);
+
+    setArray([...arr]);
+
+    await sleep(
+      Math.max(60, speed * 0.7)
+    );
+
+    // --------------------------------------------------
+    // SORTED PORTION
+    // --------------------------------------------------
+
+    setCurrentLine(6);
+
+    setMinBar(-1);
 
     setActiveBars([]);
     setSwappingBars([]);
 
-    // Remove purple after it reaches its position
-    setMinBar(-1);
-
-    // ==================================================
-    // MARK SORTED PREFIX
-    // ==================================================
-
-    const sortedPrefix = [];
+    // Everything from 0 → i is sorted
+    const sorted = [];
 
     for (let k = 0; k <= i; k++) {
-      sortedPrefix.push(k);
+      sorted.push(k);
     }
 
-    setSortedBars(sortedPrefix);
+    setSortedBars(sorted);
 
-    // ==================================================
+    // --------------------------------------------------
     // PROGRESS
-    // ==================================================
+    // --------------------------------------------------
 
     setProgress(
       Math.round(
@@ -275,17 +305,20 @@ export async function insertionSort(
     );
 
     await sleep(
-      Math.max(40, speed * 0.5)
+      Math.max(30, speed * 0.3)
     );
   }
 
   // ==================================================
-  // COMPLETED
+  // FINAL STATE
   // ==================================================
 
   setArray([...arr]);
 
-  // Everything green
+  setActiveBars([]);
+  setSwappingBars([]);
+  setMinBar(-1);
+
   setSortedBars(
     Array.from(
       { length: arr.length },
@@ -293,11 +326,11 @@ export async function insertionSort(
     )
   );
 
-  setActiveBars([]);
-  setSwappingBars([]);
-  setMinBar(-1);
-
   setProgress(100);
+
+  // ==================================================
+  // TIME
+  // ==================================================
 
   setElapsedTime(
     Math.round(
@@ -306,6 +339,10 @@ export async function insertionSort(
   );
 
   setCurrentLine(0);
+
+  // ==================================================
+  // COMPLETE
+  // ==================================================
 
   setSortingFinished(true);
   setIsSorting(false);

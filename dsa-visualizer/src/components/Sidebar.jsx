@@ -12,18 +12,174 @@ function Sidebar({
 }) {
   const safeProgress = Math.min(100, Math.max(0, progress || 0));
 
+  // ==================================================
+  // COLOUR INDICATOR DATA
+  // ==================================================
+
+  let indicators = [];
+
+  // --------------------------------------------------
+  // BUBBLE SORT
+  // --------------------------------------------------
+
+  if (selectedAlgorithm === "bubble") {
+    indicators = [
+      {
+        color:
+          "bg-gradient-to-t from-cyan-700 to-cyan-300 shadow-[0_0_8px_rgba(34,211,238,0.35)]",
+        title: "Normal",
+        description: "Unprocessed element",
+      },
+      {
+        color:
+          "bg-gradient-to-t from-red-700 to-red-400 shadow-[0_0_10px_rgba(239,68,68,0.55)]",
+        title: "Comparing",
+        description: "Elements currently being compared",
+      },
+      {
+        color:
+          "bg-gradient-to-t from-orange-700 to-orange-400 border border-orange-300 shadow-[0_0_10px_rgba(251,146,60,0.65)]",
+        title: "Swapping",
+        description: "Elements currently being swapped",
+      },
+      {
+        color:
+          "bg-gradient-to-t from-green-700 to-green-400 shadow-[0_0_10px_rgba(34,197,94,0.55)]",
+        title: "Sorted",
+        description: "Element in its final position",
+      },
+    ];
+  }
+
+  // --------------------------------------------------
+  // SELECTION SORT
+  // --------------------------------------------------
+
+  else if (selectedAlgorithm === "selection") {
+    indicators = [
+      {
+        color:
+          "bg-gradient-to-t from-cyan-700 to-cyan-300 shadow-[0_0_8px_rgba(34,211,238,0.35)]",
+        title: "Normal",
+        description: "Unprocessed element",
+      },
+      {
+        color:
+          "bg-gradient-to-t from-violet-950 via-violet-700 to-violet-400 border-2 border-violet-200 shadow-[0_0_15px_rgba(139,92,246,0.9)]",
+        title: "Minimum",
+        description: "Current minimum element",
+      },
+      {
+        color:
+          "bg-gradient-to-t from-red-700 to-red-400 shadow-[0_0_10px_rgba(239,68,68,0.55)]",
+        title: "Comparing",
+        description: "Element being compared with minimum",
+      },
+      {
+        color:
+          "bg-gradient-to-t from-orange-700 to-orange-400 border border-orange-300 shadow-[0_0_10px_rgba(251,146,60,0.65)]",
+        title: "Swapping",
+        description: "Elements currently being swapped",
+      },
+      {
+        color:
+          "bg-gradient-to-t from-green-700 to-green-400 shadow-[0_0_10px_rgba(34,197,94,0.55)]",
+        title: "Sorted",
+        description: "Element in its final position",
+      },
+    ];
+  }
+
+  // --------------------------------------------------
+  // INSERTION SORT
+  // --------------------------------------------------
+
+  else if (selectedAlgorithm === "insertion") {
+    indicators = [
+      {
+        color:
+          "bg-gradient-to-t from-cyan-700 to-cyan-300 shadow-[0_0_8px_rgba(34,211,238,0.35)]",
+        title: "Normal",
+        description: "Unprocessed element",
+      },
+      {
+        color:
+          "bg-gradient-to-t from-violet-950 via-violet-700 to-violet-400 border-2 border-violet-200 shadow-[0_0_15px_rgba(139,92,246,0.9)]",
+        title: "Key",
+        description: "Current element being inserted",
+      },
+      {
+        color:
+          "bg-gradient-to-t from-red-700 to-red-400 shadow-[0_0_10px_rgba(239,68,68,0.55)]",
+        title: "Comparing",
+        description: "Elements currently being compared",
+      },
+      {
+        color:
+          "bg-gradient-to-t from-orange-700 to-orange-400 border border-orange-300 shadow-[0_0_10px_rgba(251,146,60,0.65)]",
+        title: "Moving",
+        description: "Element being moved to make space",
+      },
+      {
+        color:
+          "bg-gradient-to-t from-green-700 to-green-400 shadow-[0_0_10px_rgba(34,197,94,0.55)]",
+        title: "Sorted",
+        description: "Element in sorted portion",
+      },
+    ];
+  }
+
+  // --------------------------------------------------
+  // MERGE SORT
+  // --------------------------------------------------
+
+  else if (selectedAlgorithm === "merge") {
+    indicators = [
+      {
+        color:
+          "bg-gradient-to-t from-cyan-700 to-cyan-300 shadow-[0_0_8px_rgba(34,211,238,0.35)]",
+        title: "Normal",
+        description: "Unprocessed element",
+      },
+      {
+        color:
+          "bg-gradient-to-t from-violet-950 via-violet-700 to-violet-400 border-2 border-violet-300 shadow-[0_0_15px_rgba(139,92,246,0.9)]",
+        title: "Merge Range",
+        description: "Section currently being processed",
+      },
+      {
+        color:
+          "bg-gradient-to-t from-red-700 to-red-400 shadow-[0_0_10px_rgba(239,68,68,0.55)]",
+        title: "Comparing",
+        description: "Elements currently being compared",
+      },
+      {
+        color:
+          "bg-gradient-to-t from-orange-700 to-orange-400 border border-orange-300 shadow-[0_0_10px_rgba(251,146,60,0.65)]",
+        title: "Writing",
+        description: "Element being placed into the array",
+      },
+      {
+        color:
+          "bg-gradient-to-t from-green-700 to-green-400 shadow-[0_0_10px_rgba(34,197,94,0.55)]",
+        title: "Sorted",
+        description: "Entire array has been sorted",
+      },
+    ];
+  }
+
   return (
     <div className="space-y-4">
 
-      {/* ============================================
+      {/* ==================================================
           COMPLEXITY
-      ============================================ */}
+      ================================================== */}
 
       <ComplexityCard algorithm={selectedAlgorithm} />
 
-      {/* ============================================
+      {/* ==================================================
           STATISTICS
-      ============================================ */}
+      ================================================== */}
 
       <div className="bg-slate-900/80 border border-slate-700 rounded-2xl p-4">
 
@@ -33,14 +189,12 @@ function Sidebar({
 
         <div className="grid grid-cols-2 gap-3">
 
-          {/* Comparisons */}
           <StatCard
             title="Comparisons"
             value={comparisons}
             color="cyan"
           />
 
-          {/* Swaps / Writes */}
           <StatCard
             title={
               selectedAlgorithm === "merge"
@@ -51,7 +205,6 @@ function Sidebar({
             color="orange"
           />
 
-          {/* Time */}
           <StatCard
             title="Time"
             value={
@@ -65,7 +218,6 @@ function Sidebar({
             color="green"
           />
 
-          {/* Sorted */}
           <StatCard
             title="Sorted"
             value={
@@ -82,9 +234,9 @@ function Sidebar({
         </div>
       </div>
 
-      {/* ============================================
+      {/* ==================================================
           COLOUR INDICATOR
-      ============================================ */}
+      ================================================== */}
 
       <div className="bg-slate-900/80 border border-slate-700 rounded-2xl p-4">
 
@@ -94,150 +246,44 @@ function Sidebar({
 
         <div className="space-y-3">
 
-          {/* Normal */}
-          <div className="flex items-center gap-3">
-
+          {indicators.map((item, index) => (
             <div
-              className="
-                w-5
-                h-5
-                rounded
-                bg-gradient-to-t
-                from-cyan-700
-                to-cyan-300
-                shadow-[0_0_8px_rgba(34,211,238,0.35)]
-              "
-            />
+              key={index}
+              className="flex items-center gap-3"
+            >
 
-            <div>
-              <p className="text-sm font-medium text-slate-200">
-                Normal
-              </p>
-              <p className="text-xs text-slate-500">
-                Unprocessed element
-              </p>
+              <div
+                className={`
+                  w-5
+                  h-5
+                  rounded
+                  flex-shrink-0
+                  ${item.color}
+                `}
+              />
+
+              <div>
+                <p className="text-sm font-medium text-slate-200">
+                  {item.title}
+                </p>
+
+                <p className="text-xs text-slate-500">
+                  {item.description}
+                </p>
+              </div>
+
             </div>
-
-          </div>
-
-          {/* Comparing */}
-          <div className="flex items-center gap-3">
-
-            <div
-              className="
-                w-5
-                h-5
-                rounded
-                bg-gradient-to-t
-                from-red-700
-                to-red-400
-                shadow-[0_0_10px_rgba(239,68,68,0.55)]
-              "
-            />
-
-            <div>
-              <p className="text-sm font-medium text-slate-200">
-                Comparing
-              </p>
-              <p className="text-xs text-slate-500">
-                Elements currently being compared
-              </p>
-            </div>
-
-          </div>
-
-          {/* Swapping */}
-          <div className="flex items-center gap-3">
-
-            <div
-              className="
-                w-5
-                h-5
-                rounded
-                bg-gradient-to-t
-                from-orange-700
-                to-orange-400
-                border
-                border-orange-300
-                shadow-[0_0_10px_rgba(251,146,60,0.65)]
-              "
-            />
-
-            <div>
-              <p className="text-sm font-medium text-slate-200">
-                Swapping / Writing
-              </p>
-              <p className="text-xs text-slate-500">
-                Elements currently being moved
-              </p>
-            </div>
-
-          </div>
-
-          {/* Minimum */}
-          <div className="flex items-center gap-3">
-
-            <div
-              className="
-                w-5
-                h-5
-                rounded
-                bg-gradient-to-t
-                from-purple-700
-                to-purple-400
-                border
-                border-purple-300
-                shadow-[0_0_10px_rgba(168,85,247,0.55)]
-              "
-            />
-
-            <div>
-              <p className="text-sm font-medium text-slate-200">
-                Minimum / Key
-              </p>
-              <p className="text-xs text-slate-500">
-                Current minimum or insertion key
-              </p>
-            </div>
-
-          </div>
-
-          {/* Sorted */}
-          <div className="flex items-center gap-3">
-
-            <div
-              className="
-                w-5
-                h-5
-                rounded
-                bg-gradient-to-t
-                from-green-700
-                to-green-400
-                shadow-[0_0_10px_rgba(34,197,94,0.55)]
-              "
-            />
-
-            <div>
-              <p className="text-sm font-medium text-slate-200">
-                Sorted
-              </p>
-              <p className="text-xs text-slate-500">
-                Element in its final position
-              </p>
-            </div>
-
-          </div>
+          ))}
 
         </div>
       </div>
 
-      {/* ============================================
+      {/* ==================================================
           PROGRESS
-      ============================================ */}
+      ================================================== */}
 
       <div className="bg-slate-900/80 border border-slate-700 rounded-2xl p-4">
 
-        {/* Header */}
         <div className="flex items-center justify-between mb-2">
 
           <div>
@@ -256,10 +302,8 @@ function Sidebar({
 
         </div>
 
-        {/* Progress Track */}
         <div className="relative h-3 bg-slate-700 rounded-full overflow-hidden">
 
-          {/* Progress Fill */}
           <div
             className="
               h-full
@@ -276,7 +320,6 @@ function Sidebar({
             }}
           />
 
-          {/* Shine */}
           {safeProgress > 0 && safeProgress < 100 && (
             <div
               className="
@@ -296,7 +339,6 @@ function Sidebar({
 
         </div>
 
-        {/* Progress Status */}
         <div className="flex justify-between items-center mt-2 text-xs">
 
           <span className="text-slate-500">

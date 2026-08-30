@@ -70,7 +70,14 @@ function App() {
 
   // Promise of currently running algorithm
   const sortingPromiseRef = useRef(null);
+// ==================================================
+// LIVE TIMER REFS
+// ==================================================
 
+const timerRef = useRef(null);
+const timerStartRef = useRef(0);
+const pausedTimeRef = useRef(0);
+const pauseStartRef = useRef(null);
   // ==================================================
   // SWAP ANIMATION
   // ==================================================
@@ -303,8 +310,7 @@ case "selection":
     setCurrentLine,
     setProgress,
     () => isPausedRef.current,
-    () => stopSortingRef.current,
-    setSortingFinished
+    () => stopSortingRef.current
   );
   break;
 
