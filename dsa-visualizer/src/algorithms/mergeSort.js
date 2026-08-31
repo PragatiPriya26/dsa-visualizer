@@ -40,11 +40,41 @@ export async function mergeSort(
         return false;
       }
 
+      // IMPORTANT:
+      // Do not clear any visual state while paused.
+      // Purple / red / orange remains frozen.
       await sleep(50);
     }
 
     if (getStopSorting()) {
       return false;
+    }
+
+    return true;
+  }
+
+  // ==================================================
+  // PAUSE-SAFE SLEEP
+  // ==================================================
+
+  async function pauseSafeSleep(ms) {
+    const interval = 25;
+    let elapsed = 0;
+
+    while (elapsed < ms) {
+      if (getStopSorting()) {
+        return false;
+      }
+
+      if (!(await waitIfPaused())) {
+        return false;
+      }
+
+      const remaining = ms - elapsed;
+      const delay = Math.min(interval, remaining);
+
+      await sleep(delay);
+      elapsed += delay;
     }
 
     return true;
@@ -72,6 +102,10 @@ export async function mergeSort(
   // ==================================================
 
   async function merge(left, mid, right) {
+    // --------------------------------------------------
+    // STOP / PAUSE
+    // --------------------------------------------------
+
     if (getStopSorting()) {
       return false;
     }
@@ -81,38 +115,58 @@ export async function mergeSort(
     }
 
     // ==================================================
-    // 🟣 SHOW CURRENT MERGE RANGE
+    // 🟣 SHOW MERGE RANGE
     // ==================================================
 
     setMergeRange({
-      left: left,
-      right: right,
+      left,
+      right,
     });
 
     setActiveBars([]);
     setSwappingBars([]);
 
-    await sleep(Math.max(100, speed));
+    setCurrentLine(4);
+
+    // Keep purple range visible
+    if (
+      !(await pauseSafeSleep(
+        Math.max(100, speed)
+      ))
+    ) {
+      return false;
+    }
 
     // ==================================================
     // CREATE TEMPORARY HALVES
     // ==================================================
 
-    const leftPart = arr.slice(left, mid + 1);
-    const rightPart = arr.slice(mid + 1, right + 1);
+    const leftPart = arr.slice(
+      left,
+      mid + 1
+    );
+
+    const rightPart = arr.slice(
+      mid + 1,
+      right + 1
+    );
 
     let i = 0;
     let j = 0;
     let k = left;
 
     // ==================================================
-    // MERGE
+    // MERGE TWO HALVES
     // ==================================================
 
     while (
       i < leftPart.length &&
       j < rightPart.length
     ) {
+      // ------------------------------------------------
+      // STOP / PAUSE
+      // ------------------------------------------------
+
       if (getStopSorting()) {
         return false;
       }
@@ -121,17 +175,22 @@ export async function mergeSort(
         return false;
       }
 
+      // ------------------------------------------------
+      // CURRENT INDICES
+      // ------------------------------------------------
+
       const leftIndex = left + i;
-      const rightIndex = mid + 1 + j;
+      const rightIndex =
+        mid + 1 + j;
 
       // ==================================================
-      // 🟣 KEEP RANGE VISIBLE
-      // 🔴 SHOW ONLY TWO COMPARING ELEMENTS
+      // 🟣 PURPLE RANGE
+      // 🔴 RED COMPARISON
       // ==================================================
 
       setMergeRange({
-        left: left,
-        right: right,
+        left,
+        right,
       });
 
       setCurrentLine(5);
@@ -146,10 +205,22 @@ export async function mergeSort(
       comparisons++;
       setComparisons(comparisons);
 
-      await sleep(speed);
+      if (
+        !(await pauseSafeSleep(speed))
+      ) {
+        return false;
+      }
+
+      // ------------------------------------------------
+      // STOP CHECK
+      // ------------------------------------------------
+
+      if (getStopSorting()) {
+        return false;
+      }
 
       // ==================================================
-      // CHOOSE SMALLER
+      // CHOOSE SMALLER ELEMENT
       // ==================================================
 
       let selected;
@@ -166,7 +237,7 @@ export async function mergeSort(
       }
 
       // ==================================================
-      // 🟠 WRITE ELEMENT
+      // 🟠 WRITE
       // ==================================================
 
       setCurrentLine(6);
@@ -175,6 +246,12 @@ export async function mergeSort(
 
       setSwappingBars([k]);
 
+      // Keep purple range visible
+      setMergeRange({
+        left,
+        right,
+      });
+
       arr[k] = selected;
 
       writes++;
@@ -182,7 +259,13 @@ export async function mergeSort(
 
       setArray([...arr]);
 
-      await sleep(speed);
+      if (
+        !(await pauseSafeSleep(
+          Math.max(50, speed * 0.8)
+        ))
+      ) {
+        return false;
+      }
 
       setSwappingBars([]);
 
@@ -193,8 +276,11 @@ export async function mergeSort(
       // ==================================================
 
       setProgress(
-        Math.round(
-          (k / arr.length) * 100
+        Math.min(
+          99,
+          Math.round(
+            (k / arr.length) * 100
+          )
         )
       );
     }
@@ -203,7 +289,9 @@ export async function mergeSort(
     // REMAINING LEFT
     // ==================================================
 
-    while (i < leftPart.length) {
+    while (
+      i < leftPart.length
+    ) {
       if (getStopSorting()) {
         return false;
       }
@@ -215,8 +303,13 @@ export async function mergeSort(
       setCurrentLine(7);
 
       setActiveBars([]);
-
       setSwappingBars([k]);
+
+      // Purple range remains visible
+      setMergeRange({
+        left,
+        right,
+      });
 
       arr[k] = leftPart[i];
 
@@ -228,13 +321,22 @@ export async function mergeSort(
 
       setArray([...arr]);
 
-      await sleep(speed);
+      if (
+        !(await pauseSafeSleep(
+          Math.max(50, speed * 0.8)
+        ))
+      ) {
+        return false;
+      }
 
       setSwappingBars([]);
 
       setProgress(
-        Math.round(
-          (k / arr.length) * 100
+        Math.min(
+          99,
+          Math.round(
+            (k / arr.length) * 100
+          )
         )
       );
     }
@@ -243,7 +345,9 @@ export async function mergeSort(
     // REMAINING RIGHT
     // ==================================================
 
-    while (j < rightPart.length) {
+    while (
+      j < rightPart.length
+    ) {
       if (getStopSorting()) {
         return false;
       }
@@ -255,8 +359,13 @@ export async function mergeSort(
       setCurrentLine(8);
 
       setActiveBars([]);
-
       setSwappingBars([k]);
+
+      // Purple range remains visible
+      setMergeRange({
+        left,
+        right,
+      });
 
       arr[k] = rightPart[j];
 
@@ -268,34 +377,48 @@ export async function mergeSort(
 
       setArray([...arr]);
 
-      await sleep(speed);
+      if (
+        !(await pauseSafeSleep(
+          Math.max(50, speed * 0.8)
+        ))
+      ) {
+        return false;
+      }
 
       setSwappingBars([]);
 
       setProgress(
-        Math.round(
-          (k / arr.length) * 100
+        Math.min(
+          99,
+          Math.round(
+            (k / arr.length) * 100
+          )
         )
       );
     }
 
     // ==================================================
-    // 🟣 KEEP MERGE RANGE VISIBLE
+    // 🟣 MERGE COMPLETE
     // ==================================================
 
     setActiveBars([]);
     setSwappingBars([]);
 
     setMergeRange({
-      left: left,
-      right: right,
+      left,
+      right,
     });
 
-    await sleep(
-      Math.max(150, speed)
-    );
+    // Show completed merge section
+    if (
+      !(await pauseSafeSleep(
+        Math.max(120, speed)
+      ))
+    ) {
+      return false;
+    }
 
-    // Clear range
+    // Clear merge range
     setMergeRange(null);
 
     return true;
@@ -306,6 +429,10 @@ export async function mergeSort(
   // ==================================================
 
   async function sort(left, right) {
+    // --------------------------------------------------
+    // STOP / PAUSE
+    // --------------------------------------------------
+
     if (getStopSorting()) {
       return false;
     }
@@ -314,7 +441,10 @@ export async function mergeSort(
       return false;
     }
 
-    // One element
+    // --------------------------------------------------
+    // SINGLE ELEMENT
+    // --------------------------------------------------
+
     if (left >= right) {
       return true;
     }
@@ -330,22 +460,22 @@ export async function mergeSort(
     );
 
     // ==================================================
-    // 🟣 SHOW CURRENT SECTION
+    // 🟣 SHOW CURRENT RANGE
     // ==================================================
 
     setMergeRange({
-      left: left,
-      right: right,
+      left,
+      right,
     });
 
     setActiveBars([]);
     setSwappingBars([]);
 
-    await sleep(
-      Math.max(100, speed)
-    );
-
-    if (getStopSorting()) {
+    if (
+      !(await pauseSafeSleep(
+        Math.max(80, speed)
+      ))
+    ) {
       return false;
     }
 
@@ -369,7 +499,10 @@ export async function mergeSort(
     setCurrentLine(3);
 
     const rightDone =
-      await sort(mid + 1, right);
+      await sort(
+        mid + 1,
+        right
+      );
 
     if (!rightDone) {
       return false;
@@ -423,7 +556,7 @@ export async function mergeSort(
     );
 
   // ==================================================
-  // STOPPED
+  // STOPPED / RESET
   // ==================================================
 
   if (
@@ -435,7 +568,7 @@ export async function mergeSort(
   }
 
   // ==================================================
-  // COMPLETE
+  // FINAL ARRAY
   // ==================================================
 
   setArray([...arr]);
@@ -443,21 +576,26 @@ export async function mergeSort(
   setActiveBars([]);
   setSwappingBars([]);
 
-  // Remove purple merge range
   setMergeRange(null);
 
   // ==================================================
-  // 🟢 EVERYTHING GREEN
+  // 🟢 EVERYTHING SORTED
   // ==================================================
 
   setSortedBars(
     Array.from(
-      { length: arr.length },
+      {
+        length: arr.length,
+      },
       (_, i) => i
     )
   );
 
   setProgress(100);
+
+  // ==================================================
+  // TIME
+  // ==================================================
 
   setElapsedTime(
     Math.round(
@@ -466,6 +604,10 @@ export async function mergeSort(
   );
 
   setCurrentLine(0);
+
+  // ==================================================
+  // COMPLETE
+  // ==================================================
 
   setSortingFinished(true);
   setIsSorting(false);

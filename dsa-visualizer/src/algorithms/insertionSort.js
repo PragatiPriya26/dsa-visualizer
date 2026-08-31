@@ -54,7 +54,7 @@ export async function insertionSort(
   // CLEANUP
   // ==================================================
 
-  function stopSortingCleanup() {
+  function cleanup() {
     setActiveBars([]);
     setSwappingBars([]);
     setMinBar(-1);
@@ -87,12 +87,13 @@ export async function insertionSort(
   // ==================================================
 
   for (let i = 1; i < arr.length; i++) {
+
     // --------------------------------------------------
     // STOP
     // --------------------------------------------------
 
     if (getStopSorting()) {
-      stopSortingCleanup();
+      cleanup();
       return;
     }
 
@@ -101,19 +102,19 @@ export async function insertionSort(
     // --------------------------------------------------
 
     if (!(await waitIfPaused())) {
-      stopSortingCleanup();
+      cleanup();
       return;
     }
 
     // --------------------------------------------------
-    // CURRENT KEY
+    // KEY
     // --------------------------------------------------
 
     const key = arr[i];
 
     let j = i - 1;
 
-    // 🟣 KEY / CURRENT ELEMENT
+    // 🟣 KEY
     setMinBar(i);
 
     setActiveBars([]);
@@ -124,16 +125,17 @@ export async function insertionSort(
     await sleep(speed);
 
     // --------------------------------------------------
-    // SEARCH FOR POSITION
+    // FIND CORRECT POSITION
     // --------------------------------------------------
 
     while (j >= 0) {
+
       // ------------------------------------------------
       // STOP
       // ------------------------------------------------
 
       if (getStopSorting()) {
-        stopSortingCleanup();
+        cleanup();
         return;
       }
 
@@ -142,21 +144,20 @@ export async function insertionSort(
       // ------------------------------------------------
 
       if (!(await waitIfPaused())) {
-        stopSortingCleanup();
+        cleanup();
         return;
       }
 
       // ------------------------------------------------
       // COMPARE
-      // 🔴 CURRENT ELEMENT
-      // 🟣 KEY REMAINS PURPLE
       // ------------------------------------------------
 
       setCurrentLine(3);
 
+      // 🔴 Element being compared
       setActiveBars([j]);
 
-      // Keep key purple
+      // 🟣 Key
       setMinBar(i);
 
       comparisons++;
@@ -165,40 +166,38 @@ export async function insertionSort(
       await sleep(speed);
 
       if (getStopSorting()) {
-        stopSortingCleanup();
+        cleanup();
         return;
       }
 
       // ------------------------------------------------
-      // SHIFT REQUIRED
+      // SHIFT
       // ------------------------------------------------
 
       if (arr[j].value > key.value) {
-        // ------------------------------------------------
-        // 🟠 SHIFTING ELEMENT
-        // ------------------------------------------------
 
         setCurrentLine(4);
 
+        // Remove comparison color
         setActiveBars([]);
 
+        // 🟠 Shift animation
         setSwappingBars([j, j + 1]);
 
         await sleep(
-          Math.max(50, speed * 0.6)
+          Math.max(50, speed * 0.5)
         );
 
         if (getStopSorting()) {
-          stopSortingCleanup();
+          cleanup();
           return;
         }
 
         // ------------------------------------------------
-        // SHIFT
+        // SHIFT ELEMENT
         //
         // IMPORTANT:
-        // Create a NEW ID.
-        //
+        // Give the copied element a NEW ID.
         // This prevents duplicate React keys.
         // ------------------------------------------------
 
@@ -213,24 +212,22 @@ export async function insertionSort(
         setArray([...arr]);
 
         await sleep(
-          Math.max(50, speed * 0.7)
+          Math.max(50, speed * 0.6)
         );
 
         setSwappingBars([]);
 
         j--;
 
-        // ------------------------------------------------
-        // UPDATE KEY POSITION
-        // ------------------------------------------------
-
+        // Keep purple key position visible
         setMinBar(j + 1);
 
-        // Keep key visually highlighted
         await sleep(
-          Math.max(30, speed * 0.3)
+          Math.max(30, speed * 0.25)
         );
+
       } else {
+
         break;
       }
     }
@@ -240,32 +237,28 @@ export async function insertionSort(
     // --------------------------------------------------
 
     if (!(await waitIfPaused())) {
-      stopSortingCleanup();
+      cleanup();
       return;
     }
 
     setCurrentLine(5);
 
     setActiveBars([]);
-
     setSwappingBars([]);
 
     // --------------------------------------------------
-    // IMPORTANT
+    // Insert the ORIGINAL key object.
     //
-    // Give the key a fresh ID so that React never
-    // receives duplicate IDs after shifting.
+    // Its ID remains unique because the old position
+    // is being replaced.
     // --------------------------------------------------
 
-    arr[j + 1] = {
-      ...key,
-      id: crypto.randomUUID(),
-    };
+    arr[j + 1] = key;
 
     writes++;
     setSwaps(writes);
 
-    // Purple key position
+    // 🟣 Key position
     setMinBar(j + 1);
 
     setArray([...arr]);
@@ -275,17 +268,15 @@ export async function insertionSort(
     );
 
     // --------------------------------------------------
-    // SORTED PORTION
+    // MARK SORTED PORTION
     // --------------------------------------------------
 
     setCurrentLine(6);
 
     setMinBar(-1);
-
     setActiveBars([]);
     setSwappingBars([]);
 
-    // Everything from 0 → i is sorted
     const sorted = [];
 
     for (let k = 0; k <= i; k++) {
@@ -310,7 +301,7 @@ export async function insertionSort(
   }
 
   // ==================================================
-  // FINAL STATE
+  // COMPLETE
   // ==================================================
 
   setArray([...arr]);
@@ -341,7 +332,7 @@ export async function insertionSort(
   setCurrentLine(0);
 
   // ==================================================
-  // COMPLETE
+  // FINISHED
   // ==================================================
 
   setSortingFinished(true);
