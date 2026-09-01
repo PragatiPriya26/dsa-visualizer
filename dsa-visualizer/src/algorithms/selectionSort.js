@@ -39,7 +39,6 @@ export async function selectionSort(
         return false;
       }
 
-      // Keep current colours visible while paused
       await sleep(50);
     }
 
@@ -105,7 +104,7 @@ export async function selectionSort(
     }
 
     // ==================================================
-    // TRACE LINE 1
+    // LINE 1
     // for (i = 0; i < n - 1; i++)
     // ==================================================
 
@@ -122,7 +121,7 @@ export async function selectionSort(
     let minIndex = i;
 
     // ==================================================
-    // TRACE LINE 2
+    // LINE 2
     // minIndex = i
     //
     // 🟣 PURPLE
@@ -165,18 +164,17 @@ export async function selectionSort(
       }
 
       // ==================================================
-      // TRACE LINE 3
-      // for (j = i + 1; ...)
+      // LINE 3
       // ==================================================
 
       setCurrentLine(3);
 
       // ==================================================
-      // TRACE LINE 4
-      // Compare array[j] with array[minIndex]
+      // LINE 4
+      // Compare
       //
-      // 🔴 j = RED
-      // 🟣 minIndex = PURPLE
+      // 🔴 j
+      // 🟣 minIndex
       // ==================================================
 
       setCurrentLine(4);
@@ -185,7 +183,6 @@ export async function selectionSort(
       setMinBar(minIndex);
 
       comparisons++;
-
       setComparisons(comparisons);
 
       await sleep(speed);
@@ -205,7 +202,7 @@ export async function selectionSort(
       ) {
 
         // ==================================================
-        // TRACE LINE 6
+        // LINE 6
         // Update minIndex
         // ==================================================
 
@@ -213,17 +210,12 @@ export async function selectionSort(
 
         minIndex = j;
 
-        // 🟣 Purple moves to new minimum
         setMinBar(minIndex);
 
-        // Remove red
         setActiveBars([]);
 
         await sleep(
-          Math.max(
-            50,
-            speed * 0.5
-          )
+          Math.max(50, speed * 0.5)
         );
       }
     }
@@ -233,21 +225,17 @@ export async function selectionSort(
     // ==================================================
 
     setActiveBars([]);
-
     setMinBar(minIndex);
 
     // ==================================================
-    // TRACE LINE 7
+    // LINE 7
     // Swap array[i] and array[minIndex]
     // ==================================================
 
     setCurrentLine(7);
 
     await sleep(
-      Math.max(
-        50,
-        speed * 0.5
-      )
+      Math.max(50, speed * 0.5)
     );
 
     if (getStopSorting()) {
@@ -261,20 +249,15 @@ export async function selectionSort(
 
     if (minIndex !== i) {
 
-      // 🟠 Moving elements
       setSwappingBars([
         i,
         minIndex,
       ]);
 
-      // Keep minimum purple until movement begins
       setMinBar(minIndex);
 
       await sleep(
-        Math.max(
-          60,
-          speed * 0.5
-        )
+        Math.max(60, speed * 0.5)
       );
 
       if (getStopSorting()) {
@@ -282,19 +265,19 @@ export async function selectionSort(
         return;
       }
 
-      // Actual swap
+      // ==================================================
+      // ACTUAL SWAP
+      // ==================================================
+
       [arr[i], arr[minIndex]] = [
         arr[minIndex],
         arr[i],
       ];
 
       swaps++;
-
       setSwaps(swaps);
 
-      setArray([
-        ...arr,
-      ]);
+      setArray([...arr]);
 
       await sleep(speed);
 
@@ -302,22 +285,23 @@ export async function selectionSort(
     }
 
     // ==================================================
-    // POSITION i IS SORTED
+    // POSITION i IS NOW PERMANENTLY SORTED
     // ==================================================
 
     setMinBar(-1);
     setActiveBars([]);
+    setSwappingBars([]);
 
-    setSortedBars((prev) => {
-      if (prev.includes(i)) {
-        return prev;
-      }
+    // IMPORTANT:
+    // Explicitly mark 0 -> i as sorted.
+    // This guarantees the first bar remains green.
 
-      return [
-        ...prev,
-        i,
-      ];
-    });
+    const sortedPrefix = Array.from(
+      { length: i + 1 },
+      (_, index) => index
+    );
+
+    setSortedBars(sortedPrefix);
 
     // ==================================================
     // PROGRESS
@@ -325,17 +309,12 @@ export async function selectionSort(
 
     setProgress(
       Math.round(
-        ((i + 1) /
-          arr.length) *
-          100
+        ((i + 1) / arr.length) * 100
       )
     );
 
     await sleep(
-      Math.max(
-        30,
-        speed * 0.4
-      )
+      Math.max(30, speed * 0.4)
     );
   }
 
@@ -343,22 +322,29 @@ export async function selectionSort(
   // FINAL ELEMENT
   // ==================================================
 
-  setArray([
-    ...arr,
-  ]);
+  if (!(await waitIfPaused())) {
+    cleanup();
+    return;
+  }
 
-  setSortedBars(
-    Array.from(
-      {
-        length: arr.length,
-      },
-      (_, index) => index
-    )
-  );
+  setCurrentLine(7);
 
   setActiveBars([]);
   setSwappingBars([]);
   setMinBar(-1);
+
+  // ==================================================
+  // EVERYTHING IS SORTED
+  // ==================================================
+
+  setSortedBars(
+    Array.from(
+      { length: arr.length },
+      (_, index) => index
+    )
+  );
+
+  setArray([...arr]);
 
   setProgress(100);
 

@@ -105,17 +105,18 @@ function TracePanel({
   // ==================================================
 
   return (
-    <div className="bg-slate-900/90 border border-slate-700 rounded-2xl shadow-xl overflow-hidden">
+    <div className="bg-slate-900/90 border border-slate-700 rounded-2xl shadow-xl overflow-hidden w-full">
 
       {/* ==================================================
           HEADER
       ================================================== */}
 
-      <div className="px-5 py-4 border-b border-slate-700">
+      <div className="px-4 sm:px-5 py-4 border-b border-slate-700">
 
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-3">
 
-          <div>
+          <div className="min-w-0">
+
             <h2 className="text-lg font-bold text-cyan-300">
               Algorithm Trace
             </h2>
@@ -123,9 +124,10 @@ function TracePanel({
             <p className="text-xs text-slate-500 mt-1">
               {algorithmName}
             </p>
+
           </div>
 
-          <div className="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700">
+          <div className="flex-shrink-0 px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700">
 
             <span className="text-xs text-slate-400">
               Step {currentLine > 0 ? currentLine : "—"}
@@ -141,7 +143,7 @@ function TracePanel({
           DESCRIPTION
       ================================================== */}
 
-      <div className="px-5 py-4 border-b border-slate-800">
+      <div className="px-4 sm:px-5 py-4 border-b border-slate-800">
 
         <p className="text-sm text-slate-400 leading-relaxed">
           {descriptions[algorithm] || descriptions.bubble}
@@ -153,72 +155,95 @@ function TracePanel({
           CODE
       ================================================== */}
 
-      <div className="p-4">
+      <div className="p-3 sm:p-4">
 
-        <div className="bg-slate-950 rounded-xl border border-slate-800 overflow-hidden">
+        {/* Horizontal scrolling ONLY for code */}
 
-          {code.map((line, index) => {
+        <div
+          className="
+            bg-slate-950
+            rounded-xl
+            border
+            border-slate-800
+            overflow-x-auto
+            overflow-y-hidden
+            max-w-full
+          "
+        >
 
-            const isActive = index === activeIndex;
+          <div className="min-w-max py-1">
 
-            return (
-              <div
-                key={index}
-                className={`
-                  flex
-                  items-center
-                  min-h-[38px]
-                  px-4
-                  transition-all
-                  duration-200
-                  ${
-                    isActive
-                      ? "bg-cyan-500/15 border-l-4 border-cyan-400"
-                      : "border-l-4 border-transparent"
-                  }
-                `}
-              >
+            {code.map((line, index) => {
 
-                {/* LINE NUMBER */}
+              const isActive =
+                index === activeIndex;
 
-                <span
+              return (
+                <div
+                  key={index}
                   className={`
-                    w-8
-                    text-right
-                    mr-4
-                    text-xs
-                    font-mono
-                    select-none
+                    flex
+                    items-center
+                    min-h-[38px]
+                    px-3
+                    sm:px-4
+                    transition-all
+                    duration-200
                     ${
                       isActive
-                        ? "text-cyan-300"
-                        : "text-slate-600"
+                        ? "bg-cyan-500/15 border-l-4 border-cyan-400"
+                        : "border-l-4 border-transparent"
                     }
                   `}
                 >
-                  {index + 1}
-                </span>
 
-                {/* CODE */}
+                  {/* LINE NUMBER */}
 
-                <code
-                  className={`
-                    font-mono
-                    text-sm
-                    whitespace-pre
-                    ${
-                      isActive
-                        ? "text-cyan-100 font-semibold"
-                        : "text-slate-400"
-                    }
-                  `}
-                >
-                  {line}
-                </code>
+                  <span
+                    className={`
+                      w-7
+                      sm:w-8
+                      text-right
+                      mr-3
+                      sm:mr-4
+                      text-[10px]
+                      sm:text-xs
+                      font-mono
+                      select-none
+                      flex-shrink-0
+                      ${
+                        isActive
+                          ? "text-cyan-300"
+                          : "text-slate-600"
+                      }
+                    `}
+                  >
+                    {index + 1}
+                  </span>
 
-              </div>
-            );
-          })}
+                  {/* CODE */}
+
+                  <code
+                    className={`
+                      font-mono
+                      text-[11px]
+                      sm:text-sm
+                      whitespace-pre
+                      ${
+                        isActive
+                          ? "text-cyan-100 font-semibold"
+                          : "text-slate-400"
+                      }
+                    `}
+                  >
+                    {line}
+                  </code>
+
+                </div>
+              );
+            })}
+
+          </div>
 
         </div>
 
@@ -228,7 +253,7 @@ function TracePanel({
           CURRENT ACTION
       ================================================== */}
 
-      <div className="px-5 pb-5">
+      <div className="px-4 sm:px-5 pb-5">
 
         <div className="rounded-xl bg-slate-800/70 border border-slate-700 p-4">
 
@@ -251,13 +276,13 @@ function TracePanel({
               `}
             />
 
-            <div>
+            <div className="min-w-0">
 
               <p className="text-xs text-slate-500 uppercase tracking-wide">
                 Current Action
               </p>
 
-              <p className="text-sm text-slate-200 mt-1">
+              <p className="text-sm text-slate-200 mt-1 break-words">
                 {currentStep}
               </p>
 
