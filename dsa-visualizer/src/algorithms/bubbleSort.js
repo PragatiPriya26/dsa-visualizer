@@ -24,31 +24,83 @@ export async function bubbleSort(
   const start = performance.now();
 
   // ==================================================
-  // SLEEP
+  // BASIC SLEEP
   // ==================================================
 
   const sleep = (ms) =>
     new Promise((resolve) => setTimeout(resolve, ms));
 
   // ==================================================
-  // PAUSE / STOP
+  // STOP CHECK
+  // ==================================================
+
+  function shouldStop() {
+    return getStopSorting();
+  }
+
+  // ==================================================
+  // WAIT WHILE PAUSED
+  //
+  // IMPORTANT:
+  // Nothing visual is changed here.
+  // Whatever colour is currently visible stays visible.
   // ==================================================
 
   async function waitIfPaused() {
     while (getIsPaused()) {
-      if (getStopSorting()) {
+      if (shouldStop()) {
         return false;
       }
 
-      // Keep all current colours visible while paused
-      await sleep(50);
+      await sleep(40);
     }
 
-    if (getStopSorting()) {
+    if (shouldStop()) {
       return false;
     }
 
     return true;
+  }
+
+  // ==================================================
+  // PAUSE-SAFE DELAY
+  //
+  // The elapsed animation time stops while paused.
+  // ==================================================
+
+  async function pauseSafeSleep(duration) {
+    let elapsed = 0;
+
+    while (elapsed < duration) {
+      // STOP
+      if (shouldStop()) {
+        return false;
+      }
+
+      // PAUSE
+      if (getIsPaused()) {
+        if (!(await waitIfPaused())) {
+          return false;
+        }
+
+        // Do NOT consume animation time while paused
+        continue;
+      }
+
+      const step = Math.min(20, duration - elapsed);
+
+      await sleep(step);
+
+      // If pause happened during the sleep,
+      // don't count that time.
+      if (getIsPaused()) {
+        continue;
+      }
+
+      elapsed += step;
+    }
+
+    return !shouldStop();
   }
 
   // ==================================================
@@ -59,8 +111,10 @@ export async function bubbleSort(
     setActiveBars([]);
     setSwappingBars([]);
     setSortedBars([]);
+
     setCurrentLine(0);
     setProgress(0);
+
     setSortingFinished(false);
     setIsSorting(false);
 
@@ -80,11 +134,12 @@ export async function bubbleSort(
   setSwaps(0);
   setElapsedTime(0);
   setProgress(0);
+
   setSortingFinished(false);
 
-  setSortedBars([]);
   setActiveBars([]);
   setSwappingBars([]);
+  setSortedBars([]);
 
   setSwapAnimation({
     leftId: null,
@@ -97,18 +152,18 @@ export async function bubbleSort(
 
   for (let i = 0; i < arr.length; i++) {
 
-    // --------------------------------------------------
+    // ==================================================
     // STOP
-    // --------------------------------------------------
+    // ==================================================
 
-    if (getStopSorting()) {
+    if (shouldStop()) {
       stopSortingCleanup();
       return;
     }
 
-    // --------------------------------------------------
+    // ==================================================
     // PAUSE
-    // --------------------------------------------------
+    // ==================================================
 
     if (!(await waitIfPaused())) {
       stopSortingCleanup();
@@ -117,12 +172,18 @@ export async function bubbleSort(
 
     // ==================================================
     // TRACE LINE 1
-    // for (i = 0; i < n; i++)
     // ==================================================
 
     setCurrentLine(1);
 
-    await sleep(Math.max(20, speed * 0.25));
+    if (
+      !(await pauseSafeSleep(
+        Math.max(20, speed * 0.25)
+      ))
+    ) {
+      stopSortingCleanup();
+      return;
+    }
 
     // ==================================================
     // INNER LOOP
@@ -134,18 +195,18 @@ export async function bubbleSort(
       j++
     ) {
 
-      // ------------------------------------------------
+      // ==================================================
       // STOP
-      // ------------------------------------------------
+      // ==================================================
 
-      if (getStopSorting()) {
+      if (shouldStop()) {
         stopSortingCleanup();
         return;
       }
 
-      // ------------------------------------------------
+      // ==================================================
       // PAUSE
-      // ------------------------------------------------
+      // ==================================================
 
       if (!(await waitIfPaused())) {
         stopSortingCleanup();
@@ -154,19 +215,21 @@ export async function bubbleSort(
 
       // ==================================================
       // TRACE LINE 2
-      // for (j = 0; ...)
       // ==================================================
 
       setCurrentLine(2);
 
-      await sleep(
-        Math.max(15, speed * 0.2)
-      );
+      if (
+        !(await pauseSafeSleep(
+          Math.max(15, speed * 0.2)
+        ))
+      ) {
+        stopSortingCleanup();
+        return;
+      }
 
       // ==================================================
-      // TRACE LINE 3
-      // Compare array[j] and array[j + 1]
-      //
+      // COMPARE
       // 🔴 RED
       // ==================================================
 
@@ -184,15 +247,19 @@ export async function bubbleSort(
         rightId: null,
       });
 
-      await sleep(speed);
+      // --------------------------------------------------
+      // RED REMAINS VISIBLE WHILE PAUSED
+      // --------------------------------------------------
 
-      if (getStopSorting()) {
+      if (
+        !(await pauseSafeSleep(speed))
+      ) {
         stopSortingCleanup();
         return;
       }
 
       // ==================================================
-      // COUNT COMPARISON
+      // COMPARISON COUNT
       // ==================================================
 
       comparisons++;
@@ -201,16 +268,15 @@ export async function bubbleSort(
 
       // ==================================================
       // TRACE LINE 4
-      // If array[j] > array[j + 1]
       // ==================================================
 
       setCurrentLine(4);
 
-      await sleep(
-        Math.max(30, speed * 0.35)
-      );
-
-      if (getStopSorting()) {
+      if (
+        !(await pauseSafeSleep(
+          Math.max(30, speed * 0.35)
+        ))
+      ) {
         stopSortingCleanup();
         return;
       }
@@ -226,8 +292,6 @@ export async function bubbleSort(
 
         // ==================================================
         // TRACE LINE 5
-        // Swap the two elements
-        //
         // 🟠 ORANGE
         // ==================================================
 
@@ -240,26 +304,20 @@ export async function bubbleSort(
           j + 1,
         ]);
 
-        // Stable ID based animation
         setSwapAnimation({
           leftId: arr[j].id,
           rightId: arr[j + 1].id,
         });
 
-        // ------------------------------------------------
-        // PAUSE SAFE
-        // ------------------------------------------------
+        // --------------------------------------------------
+        // ORANGE REMAINS VISIBLE WHILE PAUSED
+        // --------------------------------------------------
 
-        if (!(await waitIfPaused())) {
-          stopSortingCleanup();
-          return;
-        }
-
-        await sleep(
-          Math.max(40, speed * 0.65)
-        );
-
-        if (getStopSorting()) {
+        if (
+          !(await pauseSafeSleep(
+            Math.max(40, speed * 0.65)
+          ))
+        ) {
           stopSortingCleanup();
           return;
         }
@@ -277,27 +335,24 @@ export async function bubbleSort(
 
         setSwaps(swaps);
 
-        // Update array
-        setArray([
-          ...arr,
-        ]);
+        setArray([...arr]);
 
-        // ------------------------------------------------
-        // Let animation finish
-        // ------------------------------------------------
+        // ==================================================
+        // FINISH ANIMATION
+        // ==================================================
 
-        await sleep(
-          Math.max(50, speed * 1.15)
-        );
-
-        if (getStopSorting()) {
+        if (
+          !(await pauseSafeSleep(
+            Math.max(50, speed * 1.15)
+          ))
+        ) {
           stopSortingCleanup();
           return;
         }
 
-        // ------------------------------------------------
+        // ==================================================
         // CLEAR SWAP
-        // ------------------------------------------------
+        // ==================================================
 
         setSwapAnimation({
           leftId: null,
@@ -309,6 +364,9 @@ export async function bubbleSort(
 
       // ==================================================
       // CLEAR COMPARISON
+      //
+      // This only happens AFTER Resume and operation
+      // has finished.
       // ==================================================
 
       setActiveBars([]);
@@ -316,9 +374,7 @@ export async function bubbleSort(
 
     // ==================================================
     // TRACE LINE 6
-    //
-    // Mark largest element as sorted
-    //
+    // MARK LARGEST ELEMENT AS SORTED
     // 🟢 GREEN
     // ==================================================
 
@@ -327,16 +383,15 @@ export async function bubbleSort(
     const sortedIndex =
       arr.length - i - 1;
 
-    setSortedBars((prev) => {
-
+    setSortedBars((previous) => {
       if (
-        prev.includes(sortedIndex)
+        previous.includes(sortedIndex)
       ) {
-        return prev;
+        return previous;
       }
 
       return [
-        ...prev,
+        ...previous,
         sortedIndex,
       ];
     });
@@ -347,32 +402,30 @@ export async function bubbleSort(
 
     setProgress(
       Math.round(
-        ((i + 1) /
-          arr.length) *
-          100
+        ((i + 1) / arr.length) * 100
       )
     );
 
-    await sleep(
-      Math.max(20, speed * 0.3)
-    );
+    if (
+      !(await pauseSafeSleep(
+        Math.max(20, speed * 0.3)
+      ))
+    ) {
+      stopSortingCleanup();
+      return;
+    }
   }
 
   // ==================================================
   // COMPLETE
   // ==================================================
 
-  const end =
-    performance.now();
+  const end = performance.now();
 
-  setArray([
-    ...arr,
-  ]);
+  setArray([...arr]);
 
   setElapsedTime(
-    Math.round(
-      end - start
-    )
+    Math.round(end - start)
   );
 
   setCurrentLine(0);
@@ -388,15 +441,13 @@ export async function bubbleSort(
   setProgress(100);
 
   // ==================================================
-  // ALL BARS GREEN
+  // ALL GREEN
   // ==================================================
 
   setSortedBars(
     Array.from(
-      {
-        length: arr.length,
-      },
-      (_, i) => i
+      { length: arr.length },
+      (_, index) => index
     )
   );
 
@@ -405,6 +456,5 @@ export async function bubbleSort(
   // ==================================================
 
   setSortingFinished(true);
-
   setIsSorting(false);
 }
